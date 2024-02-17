@@ -63,7 +63,7 @@ export const History = () => {
   };
     const headers: HeadersInit = new Headers({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ${apiKey}',
+      'Authorization': `Bearer ${apiKey}`
     });
 
     const data: { model: string, max_tokens: number, messages: { role: string, content: string }[] } = {
@@ -76,28 +76,80 @@ export const History = () => {
           },
           {
               role: 'user',
-              content: 'Generate a history question for ${studentData?.gradeLevel} grade level.'
+              content: `Generate a history question for ${studentData?.gradeLevel} 
+                grade level. Give one correct answer, and three wrong answers in JSON`
           }
       ]
     };
-    const options: RequestInit = {
+    const options = {
       method: 'POST',
       headers,
       body: JSON.stringify(data)
-    };
-    
-    fetch(url, options)
-      .then((response: Response) => response.json())
-      .then((result: any) => {
-          console.log(result);
+  };
+  
+  let generatedQuestion: string = '';
+  fetch(url, options)
+      .then(response => response.json())
+      .then(result => {
+        generatedQuestion = result.choices[0].message.content;
+      console.log(generatedQuestion);
       })
-      .catch((error: any) => {
-          console.error('Error:', error);
-    });
+      .catch(error => {
+      console.error('Error:', error);
+      });
     
     return (
-    <View>
-      <Text>History</Text>
+      <View style={styles.container}>
+      <Text style={styles.header}>History Quiz</Text>
+      <Text style={styles.gradeLevel}>
+        Grade Level: {studentData?.gradeLevel}
+      </Text>
+      <Text style={styles.question}>
+        {generatedQuestion}
+      </Text>
+      <TextInput
+        value={userAnswer}
+        onChangeText={(text) => setUserAnswer(text)}
+        keyboardType="numeric"
+        placeholder="Your Answer"
+        style={styles.input}
+      />
+      <Button title="Check Answer" /*onPress={null} *//>
+      <Text style={styles.result}>{correctAnswer}</Text>
+      <Button title="Next Question" /*onPress={null} */ />
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  header: {
+    fontSize: 24,
+    marginBottom: 10,
+  },
+  gradeLevel: {
+    fontSize: 20,
+    marginBottom: 10,
+  },
+  question: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#000",
+    width: 200,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
+  result: {
+    marginTop: 10,
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+});
