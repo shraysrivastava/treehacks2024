@@ -1,14 +1,68 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+} from "react-native";
 import { signOutUser } from "../../../firebase/auth";
+import { auth } from "../../../firebase/firebase";
+import {
+  DocumentData,
+  doc,
+  getDoc,
+  getFirestore,
+  updateDoc,
+} from "firebase/firestore";
 
 export const ProfileHome = () => {
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  const [studentData, setStudentData] = useState<DocumentData>();
+
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      const db = getFirestore();
+      const user = auth.currentUser;
+
+      if (user) {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setStudentData(docSnap.data());
+        } else {
+          console.log("No such document!");
+        }
+      }
+    };
+
+    fetchStudentData();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.text}>Profile Home</Text>
-      <TouchableOpacity style={styles.logoutButton} onPress={() => signOutUser(setError)}>
+      {studentData && (
+        <View style={styles.userInfoContainer}>
+          <View style={styles.userInfoItem}>
+            <Text style={styles.label}>Name:</Text>
+            <Text style={styles.value}>{studentData.name}</Text>
+          </View>
+          <View style={styles.userInfoItem}>
+            <Text style={styles.label}>Email: </Text>
+            <Text style={styles.value}>{studentData.email}</Text>
+          </View>
+          <View style={styles.userInfoItem}>
+            <Text style={styles.label}>Account Type:</Text>
+            <Text style={styles.value}>{studentData.accountType}</Text>
+          </View>
+        </View>
+      )}
+      <TouchableOpacity
+        style={styles.logoutButton}
+        onPress={() => signOutUser(setError)}
+      >
         <Text style={styles.logoutButtonText}>Logout</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -27,6 +81,34 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333", // Darker text color for better readability
     marginBottom: 20, // Adds some space before the logout button
+  },
+  userInfoContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  userInfoItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  label: {
+    fontWeight: "bold",
+    fontSize: 16,
+    color: "#333",
+  },
+  value: {
+    fontSize: 16,
+    color: "#555",
   },
   logoutButton: {
     paddingHorizontal: 20,
