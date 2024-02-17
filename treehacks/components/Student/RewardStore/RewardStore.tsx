@@ -5,11 +5,10 @@ import { auth } from "../../../firebase/firebase";
 import { FirebaseError } from "firebase/app";
 import { getFirestore, updateDoc, doc, collection, addDoc } from "firebase/firestore";
 import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
-import { decode } from 'base-64';
-import { FileSystem } from 'expo-file-system';
-if(typeof atob === 'undefined') {
-  global.atob = decode;
-}
+import axios from 'axios';
+import { baseDir, uploaderEndpoint, uploaderKey } from "./api";
+import queryString from 'query-string';
+
 export const RewardStoreHome = () => {
     const [apiResponses, setApiResponses] = useState<string[]>([]);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -40,91 +39,40 @@ export const RewardStoreHome = () => {
         }
     };
 
-
-    // const uploadImageToStorage = async (imageBase64: string) => {
-    //     function makeid() { 
-    //         let result = '';
-    //         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    //         const charactersLength = characters.length;
-    //         let counter = 0;
-    //         while (counter < 10) {
-    //           result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    //           counter += 1;
-    //         }
-    //         return result;
-    //     }
-    //     const id = makeid();
-    //     const storage = getStorage();
-    //     const storageRef = ref(storage, 'images/' + id + '.jpeg');
-    //     console.log("Uploading image to storage");
-    //     console.log(imageBase64);
-    //     const aa = await uploadString(storageRef, imageBase64, "base64", {contentType: 'image/jpeg'});
-        
-    //     const downloadURL = await getDownloadURL(storageRef);
-        
-    //     return downloadURL;
-    // };]
-   
-
-const convertBase64ToImage = async (base64String: string) => {
-    const imagePath = FileSystem.cacheDirectory + 'temp.jpeg';
-    try {
-        await FileSystem.writeAsStringAsync(imagePath, base64String, { encoding: FileSystem.EncodingType.Base64 });
-        return imagePath;
-    } catch (error) {
-        console.error('Error converting base64 to image:', error);
-        throw error;
+    function generateID() { 
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        let counter = 0;
+        while (counter < 10) {
+          result += characters.charAt(Math.floor(Math.random() * charactersLength));
+          counter += 1;
+        }
+        return result;
     }
-};
 
-const uploadImageToStorage = async (imageBase64: string) => {
-    try {
-        const imagePath = await convertBase64ToImage(imageBase64);
-        const imageData = await FileSystem.readAsStringAsync(imagePath, { encoding: FileSystem.EncodingType.Base64 });
-        const storage = getStorage();
-        const storageRef = ref(storage, 'images/' + Date.now() + '.jpeg');
-        
-        await uploadString(storageRef, imageData, 'base64', { contentType: 'image/jpeg' });
-        const downloadURL = await getDownloadURL(storageRef);
-        return downloadURL;
-    } catch (error) {
-        console.error("Error uploading image:", error);
-        throw error;
-    }
-};
+    const uploadImageToStorage = async (imageBase64: string) => {
+        try {
+            const id = generateID(); // Generate unique ID
 
-    // const uploadImageToStorage = async (imageBase64: string) => {
-    //     try {
-    //         function makeid() { 
-    //             let result = '';
-    //             const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    //             const charactersLength = characters.length;
-    //             let counter = 0;
-    //             while (counter < 10) {
-    //                 result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    //                 counter += 1;
-    //             }
-    //             return result;
-    //         }
-    //         const id = makeid();
-    //         const storage = getStorage();
-    //         const storageRef = ref(storage, 'images/' + id + '.jpeg');
-    //         const byteCharacters = atob(imageBase64);
-    //         const byteNumbers = new Array(byteCharacters.length);
-    //         for (let i = 0; i < byteCharacters.length; i++) {
-    //             byteNumbers[i] = byteCharacters.charCodeAt(i);
-    //         }
-    //         const byteArray = new Uint8Array(byteNumbers);
-    //         await uploadBytes(storageRef, byteArray, { contentType: 'image/jpeg' });
-    //         const downloadURL = await getDownloadURL(storageRef);
-    //         return downloadURL;
-    //     } catch (error) {
-    //         console.error("Error uploading image:", error);
-    //         throw error;
-    //     }
-    // };
-    
-    
+            const response = await axios.post(uploaderEndpoint,  queryString.stringify({
+                imageBytes: imageBase64,
+                id: id,
+                secretKey: uploaderKey,
+            }));
+            
+            if (response.data === "Saved successfully") {
+                const imageURL = `${baseDir}/${id}.jpeg`; // Adjust the URL structure according to your API
+                return imageURL;
+            } else {
+                console.log(response.data);
+                throw new Error("Failed to upload image");
+            }
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            throw error;
+        }
+    };
 
     const addToProfileWallet = async (imageBase64: string) => {
         try {
