@@ -19,7 +19,6 @@ import {
 import { auth } from "../../../../firebase/firebase";
 import { Colors } from "../../../../constants/Colors";
 import CustomToast, { ToastProps } from "../../../../constants/Toast";
-import { RxMagicWand } from "react-icons/rx";
 
 const { width } = Dimensions.get("window");
 
