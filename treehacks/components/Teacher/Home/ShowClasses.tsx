@@ -12,6 +12,7 @@ interface ShowClassesProps {
 export const ShowClasses: React.FC<ShowClassesProps> = ({ teacherData, navigation }) => {
   // Convert classes object into an array of [className, students] tuples
   const classesArray = Object.entries(teacherData.classes);
+  // console.log("here" + classesArray);
 
   if (classesArray.length === 0) {
     return <Text>You don't have any classes yet. Would you like to create one?</Text>;
@@ -43,20 +44,20 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "black",
+    color: Colors.textPrimary,
     marginBottom: 20,
   },
   classContainer: {
     width: "100%",
     padding: 20,
     marginVertical: 8,
-    backgroundColor: "#f9c2ff",
+    backgroundColor: Colors.primary,
     borderRadius: 5,
     alignItems: "center",
   },
   classText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "black",
+    color: Colors.textPrimary,
   },
 });

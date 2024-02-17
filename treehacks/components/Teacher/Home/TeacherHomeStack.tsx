@@ -16,9 +16,9 @@ export const TeacherHomeStack = () => {
         gestureEnabled: true,
         gestureDirection: "horizontal",
         headerShown: true,
-        headerTintColor: "#fff",
+        headerTintColor: Colors.textPrimary,
         headerBackTitleVisible: false,
-        headerStyle: { backgroundColor: Colors.secondary },
+        headerStyle: { backgroundColor: Colors.primary },
       }}
     >
       <Stack.Screen name="Home" component={TeacherHome} />

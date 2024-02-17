@@ -1,13 +1,14 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, SafeAreaView, Button, ScrollView, RefreshControl } from "react-native";
 import { getFirestore, doc, updateDoc, arrayUnion, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { auth } from "../../../firebase/firebase";
+import { auth, db } from "../../../firebase/firebase";
 import { CreateClass } from "./CreateClass";
 import { ShowClasses } from "./ShowClasses";
 import { TeacherData } from "../../../constants/types";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Colors } from "../../../constants/Colors";
+import CustomToast, { ToastProps } from "../../../constants/Toast";
 
 export const TeacherHome: React.FC = () => {
   const navigation = useNavigation();
@@ -15,11 +16,11 @@ export const TeacherHome: React.FC = () => {
   const [createClassPopup, setCreateClassPopup] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [classesArray, setClassesArray] = useState<[string, string[]][]>([]);
-  
+  const [toast, setToast] = useState<ToastProps>({ message: "", color: "" });
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
 
-  const fetchTeacherData = async () => {
-    const db = getFirestore();
+  const fetchTeacherData = useCallback(async () => {
     const user = auth.currentUser;
 
     if (user) {
@@ -28,12 +29,14 @@ export const TeacherHome: React.FC = () => {
 
       if (docSnap.exists()) {
         // Cast the document data to TeacherData
+        // console.log("Document data:", docSnap.data());
         setTeacherData(docSnap.data() as TeacherData);
+        
       } else {
         console.log("No such document!");
       }
     }
-  };
+  }, []);
   
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -41,49 +44,54 @@ export const TeacherHome: React.FC = () => {
   }, [fetchTeacherData]);
   
   useEffect(() => {
-    
-
     fetchTeacherData();
+  }, [fetchTeacherData]); // Fetch teacher data
+  
+  useEffect(() => {
     if (teacherData) {
-    setClassesArray(Object.entries(teacherData.classes));
+      setClassesArray(Object.entries(teacherData.classes));
     }
-  }, []);
+  }, [teacherData]); // Update classesArray when teacherData changes
+  
 
-const updateClass = async (className: string) => {
-  const db = getFirestore();
-  const user = auth.currentUser;
-
-  if (user) {
+  const updateClass = async (className: string) => { 
+    const user = auth.currentUser;
+  
+    if (!user) {
+      setToast({ message: "No user logged in", color: "red" });
+      console.log("No user logged in");
+      return;
+    }
+  
     const userDocRef = doc(db, "users", user.uid);
-
+  
     try {
-      // First, get the current document to update the classes object correctly
       const docSnap = await getDoc(userDocRef);
-      if (docSnap.exists()) {
-        const userData = docSnap.data();
-        const updatedClasses = {
-          ...userData.classes,
-          [className]: [] // Assuming you want to initialize an empty array of students for the new class
-        };
-
-        await updateDoc(userDocRef, {
-          classes: updatedClasses
-        });
-
-        console.log("Class added successfully");
-        // Fetch updated data after adding the class
-        // Make sure you have a function fetchTeacherData() that updates your component's state
-        // fetchTeacherData(); Uncomment or modify this line according to your actual implementation
-      } else {
+  
+      if (!docSnap.exists()) {
+        setToast({ message: "Document does not exist", color: "red" });
         console.log("Document does not exist");
+        return;
       }
+  
+      const userData = docSnap.data();
+      const updatedClasses = {
+        ...userData.classes,
+        [className]: [] 
+      };
+  
+      await updateDoc(userDocRef, {
+        classes: updatedClasses
+      });
+
+      setToast({ message: "Class created successfully", color: "green" });
+  
     } catch (error) {
+      setToast({ message: "Error adding class", color: "red" });
       console.error("Error adding class: ", error);
     }
-  } else {
-    console.log("No user logged in");
-  }
-};
+  };
+  
 
   return (
     <ScrollView
@@ -99,7 +107,7 @@ const updateClass = async (className: string) => {
       }
     >
       {
-  teacherData && classesArray.length > 0 ? (
+  teacherData && classesArray.length > 0 ? ( 
     <ShowClasses teacherData={teacherData} navigation={navigation} />
   ) : (
     <Text>You don't have any classes yet. Would you like to create one?</Text>
@@ -108,6 +116,7 @@ const updateClass = async (className: string) => {
 
       <Button title="Create Class" onPress={() => setCreateClassPopup(true)} />
       <CreateClass isVisible={createClassPopup} onCancel={() => setCreateClassPopup(false)} onConfirm={updateClass} />
+      <CustomToast message={toast.message} color={toast.color}/>
     </ScrollView>
   );
 };
@@ -115,6 +124,6 @@ const updateClass = async (className: string) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "lightblue",
+    backgroundColor: Colors.background,
   },
 });

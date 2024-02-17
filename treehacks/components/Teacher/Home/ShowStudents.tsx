@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -18,11 +18,14 @@ import {
   where,
   getDocs,
   runTransaction,
+  getDoc,
 } from "firebase/firestore";
 import { auth, db } from "../../../firebase/firebase";
 import { Colors } from "../../../constants/Colors";
-import { RouteProp } from "@react-navigation/native";
+import { RouteProp, useFocusEffect } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
+import CustomToast, { ToastProps } from "../../../constants/Toast";
+import { StudentProgress } from "./StudentProgressModals";
 
 interface ShowStudentsProps {
   route: RouteProp<
@@ -31,49 +34,90 @@ interface ShowStudentsProps {
   >;
 }
 export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
-  const { className, teacherData } = route.params;
+  const { className } = route.params;
+  const [teacherData, setTeacherData] = useState<TeacherData>();
   const user = auth.currentUser;
   const [studentData, setStudentData] = useState<StudentData[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [email, setEmail] = useState("");
+  const [toast, setToast] = useState<ToastProps>({ message: "", color: "" });
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const fetchTeacherData = useCallback(async () => {
+    const user = auth.currentUser;
+
+    if (user) {
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        // Cast the document data to TeacherData
+        // console.log("Document data:", docSnap.data());
+        setTeacherData(docSnap.data() as TeacherData);
+        
+      } else {
+        console.log("No such document!");
+      }
+    }
+  }, [teacherData, className, studentData]);
 
   const fetchStudentData = useCallback(async () => {
-    // Assuming classItem.students is an array of emails for the class
+    if (!teacherData) { return null;}
     const studentEmails = teacherData.classes[className];
-  
+    console.log(studentEmails);
     if (studentEmails && studentEmails.length > 0) {
       const studentsQuery = query(
         collection(db, "users"),
         where("email", "in", studentEmails)
       );
-  
+
       try {
         const querySnapshot = await getDocs(studentsQuery);
         const fetchedStudents = querySnapshot.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
         })) as StudentData[];
-  
+
         setStudentData(fetchedStudents);
       } catch (err) {
         console.error("Error fetching students: ", err);
       }
     }
-  }, [className, teacherData]);
+  }, [className, studentData, teacherData]);
+  
   
 
+
   useEffect(() => {
-    fetchStudentData();
-    console.log(studentData);
-  }, [fetchStudentData]);
+    const fetchData = async () => {
+        await fetchTeacherData();
+        await fetchStudentData();
+    }
+    fetchData()
+    // console.log(studentData);
+  }, []);
+
+  useEffect(() => {
+    if (toast.message !== "") {
+      toastTimeoutRef.current = setTimeout(() => {
+        setToast({ message: "", color: "" });
+      }, 2000);
+    }
+  
+    return () => {
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
+    };
+  }, [toast.message]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    fetchTeacherData();
     fetchStudentData().finally(() => setRefreshing(false));
     
-  }, [fetchStudentData]);
+  }, [fetchStudentData, fetchTeacherData]);
 
-  // Helper function to validate email format
   const isValidEmail = () => {
     const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/; // Simple regex for email validation
     return regex.test(email);
@@ -82,61 +126,72 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
   const addStudentToClass = async () => {
     if (!isValidEmail()) {
       console.log("Invalid email format");
+      setToast({ message: "Invalid email format", color: Colors.toastError });
       return;
     }
   
-    // Check if the student is already in the class
-    if (teacherData.classes[className]?.includes(email)) {
-      console.log("Student already in class");
-      return;
-    }
     if (!user) {
-      console.log("No user logged in");
+      console.log("User not authenticated");
+      setToast({ message: "User not authenticated", color: Colors.toastError });
       return;
     }
-
+  
     try {
-      // Update the teacher's class with the new student email
-      await runTransaction(db, async (transaction) => {
-        const teacherDocRef = doc(db, "users", user.uid); // Assuming the teacher's document ID is the user's UID
-        const teacherDoc = await transaction.get(teacherDocRef);
+      const userDocRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(userDocRef);
   
-        if (!teacherDoc.exists()) {
-          throw new Error("Teacher document does not exist!");
-        }
+      if (!docSnap.exists()) {
+        console.log("Document does not exist");
+        setToast({ message: "Document does not exist", color: Colors.toastError });
+        return;
+      }
   
-        // Add the student's email to the class
-        const updatedClassStudents = arrayUnion(email);
-        const updatedClasses = {
-          ...teacherData.classes,
-          [className]: updatedClassStudents,
-        };
+      // Check if the document data has the classes map and the specific class
+      const userData = docSnap.data();
+      const classesMap = userData.classes || {};
+      const studentsArray = classesMap[className] || [];
   
-        // Update the teacher document with the modified classes object
-        transaction.update(teacherDocRef, { classes: updatedClasses });
+      // Check if the student is already in the class
+      if (studentsArray.includes(email)) {
+        console.log("Student already in class");
+        setToast({ message: "Student already in class", color: Colors.toastError });
+        return;
+      }
+  
+      // Append the student's email to the array
+      studentsArray.push(email);
+  
+      // Update the classes map with the new array of students
+      await updateDoc(userDocRef, {
+        [`classes.${className}`]: studentsArray // Use the dot notation to update a specific field within a map
       });
   
       console.log("Student added to class successfully");
-      fetchStudentData(); // Refresh student data to reflect the update
+      setToast({ message: "Student added to class successfully", color: Colors.toastSuccess });
+      fetchStudentData(); // Refresh to reflect the update
     } catch (err) {
       console.error("Transaction failed: ", err);
+      setToast({ message: "Transaction failed", color: Colors.toastError });
     }
   };
   
+  
 
   return (
+    <View style={styles.container}>
     <ScrollView
       contentContainerStyle={styles.container}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          colors={[Colors.primary]}
-          tintColor={Colors.primary}
+          colors={[Colors.secondary]}
+          tintColor={Colors.secondary}
           progressBackgroundColor="#ffffff"
         />
       }
     >
+      <Text style={styles.headerText}>Class: {className}</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.TextInput}
@@ -146,22 +201,22 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
           onChangeText={(text) => setEmail(text)}
         />
         <TouchableOpacity style={styles.addButton} onPress={addStudentToClass}>
-          <MaterialIcons name="add" size={24} color="white" />
+          <MaterialIcons name="add" size={24} color={Colors.background} />
         </TouchableOpacity>
       </View>
-      <Text style={styles.headerText}>Class: {className}</Text>
+
       {studentData.length > 0 ? (
         studentData.map((student, index) => (
-          <Text key={index} style={styles.text}>
-            {student.name} ({student.email})
-          </Text>
+            <StudentProgress student={student}/>
         ))
       ) : (
         <Text style={styles.text}>
           There are no students in this class yet.
         </Text>
       )}
+      <CustomToast message={toast.message} color={toast.color} />
     </ScrollView>
+    </View>
   );
 };
 
@@ -169,11 +224,13 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 10,
+    backgroundColor: Colors.background,
   },
   text: {
     fontSize: 18,
     fontWeight: "bold",
     marginVertical: 4,
+    color: Colors.textPrimary,
   },
   headerText: {
     fontSize: 24,
@@ -198,7 +255,7 @@ const styles = StyleSheet.create({
     margin: 5,
     padding: 10,
     alignItems: "center",
-    backgroundColor: Colors.green,
+    backgroundColor: Colors.accent1,
     borderRadius: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
