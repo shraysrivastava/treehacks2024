@@ -43,17 +43,20 @@ export const StudentHome: React.FC = () => {
     {
       subjectName: "Mathematics",
       gradeLevel: studentData?.gradeLevel,
-      subjectColor: Colors.blue,
+      subjectColor: Colors.primary,
+      icon: "add"
     },
     {
       subjectName: "Science",
       gradeLevel: studentData?.gradeLevel,
-      subjectColor: Colors.green,
+      subjectColor: Colors.primary,
+      icon: "science"
     },
     {
       subjectName: "History",
       gradeLevel: studentData?.gradeLevel,
-      subjectColor: Colors.red,
+      subjectColor: Colors.primary,
+      icon:"history-edu"
     },
   ];
 
@@ -67,6 +70,7 @@ export const StudentHome: React.FC = () => {
           gradeLevel={studentData?.gradeLevel}
           subjectColor={subject.subjectColor}
           navigation={navigation}
+          icon={subject.icon}
         />
       ))}
     </SafeAreaView>
@@ -77,12 +81,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "lightblue",
+    alignItems:"center",
+    backgroundColor: Colors.background,
   },
   text: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "black",
+    color: "white",
+    marginBottom:30
   },
 });
