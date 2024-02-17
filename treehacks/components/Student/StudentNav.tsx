@@ -53,7 +53,7 @@ export const StudentNav = () => {
             component={RewardStoreStack}
             options={() => ({
                 tabBarIcon: ({ color, size }) => (
-                    <MaterialIcons name="face" color={color} size={size} />
+                    <MaterialIcons name="savings" color={color} size={size} />
               ),
             })}
           />

@@ -1,11 +1,19 @@
-import React, { useState } from "react";
-import { View, TouchableOpacity, Text, StyleSheet, SafeAreaView, Button, Image } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, TouchableOpacity, Text, StyleSheet, SafeAreaView, Button, Image, ActivityIndicator, ScrollView } from "react-native";
 import { togetherClient, TogetherImageModel } from 'together-ai-sdk';
 import { auth } from "../../../firebase/firebase";
 import { FirebaseError } from "firebase/app";
 import { getFirestore, updateDoc, doc } from "firebase/firestore";
+
 export const RewardStoreHome = () => {
     const [apiResponses, setApiResponses] = useState<string[]>([]);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    useEffect(() => {
+        setLoading(true);
+        makeApiCall();
+    }, []);
 
     const makeApiCall = async () => {
         try {
@@ -20,8 +28,10 @@ export const RewardStoreHome = () => {
             });
             const newResponses = result.output.choices.map(choice => choice.imageBase64);
             setApiResponses(newResponses);
+            setLoading(false);
         } catch (error) {
             console.error(error);
+            setLoading(false);
         }
     };
 
@@ -33,30 +43,56 @@ export const RewardStoreHome = () => {
             const db = getFirestore();
             updateDoc(doc(db, "users", user.uid), {
                 wallet: {imageBase64},
-              });
+            });
+            setSelectedImage(imageBase64);
         }
+    };
+
+    const handleNext = () => {
+        // Handle the next action
+        console.log("Next button clicked");
     };
 
     return (
         <SafeAreaView style={styles.container}>
-            {apiResponses.length > 0 ? (
-                <View style={styles.imagesContainer}>
-                    {apiResponses.map((response, index) => (
-                        <TouchableOpacity
-                            key={index}
-                            style={styles.imageContainer}
-                            onPress={() => addToProfileWallet(response)}
-                        >
-                            <Image style={styles.image} source={{ uri: "data:image/png;base64," + response }} />
-                        </TouchableOpacity>
-                    ))}
-                </View>
+            {loading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
             ) : (
-                <Text style={styles.text}>No images available</Text>
+                <>
+                    {apiResponses.length > 0 ? (
+                        <>
+                            <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+                                <View style={styles.imagesContainer}>
+                                    {apiResponses.map((response, index) => (
+                                        <TouchableOpacity
+                                            key={index}
+                                            style={[
+                                                styles.imageContainer,
+                                                selectedImage === response && styles.selectedImageContainer
+                                            ]}
+                                            onPress={() => addToProfileWallet(response)}
+                                        >
+                                            {selectedImage === response && (
+                                                <View style={styles.checkIcon}>
+                                                    <Text>✓</Text>
+                                                </View>
+                                            )}
+                                            <Image style={styles.image} source={{ uri: "data:image/png;base64," + response }} />
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            </ScrollView>
+                            {selectedImage && (
+                                <TouchableOpacity style={styles.button} onPress={handleNext}>
+                                    <Text style={styles.text}>Next</Text>
+                                </TouchableOpacity>
+                            )}
+                        </>
+                    ) : (
+                        <Text style={styles.text}>No images available</Text>
+                    )}
+                </>
             )}
-            <TouchableOpacity style={styles.button} onPress={makeApiCall}>
-                <Text style={styles.text}>Generate Images</Text>
-            </TouchableOpacity>
         </SafeAreaView>
     );
 };
@@ -72,6 +108,11 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: "black",
     },
+    scrollViewContainer: {
+        flexGrow: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
     imagesContainer: {
         flexDirection: "row",
         flexWrap: "wrap",
@@ -80,6 +121,12 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         margin: 10,
+        borderRadius: 10,
+        overflow: "hidden",
+    },
+    selectedImageContainer: {
+        borderWidth: 2,
+        borderColor: "blue",
     },
     image: {
         width: 200,
@@ -91,4 +138,18 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginTop: 15,
     },
+    checkIcon: {
+        position: "absolute",
+        top: 5,
+        right: 5,
+        backgroundColor: "white",
+        borderRadius: 50,
+        width: 20,
+        height: 20,
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 1,
+    },
 });
+
+export default RewardStoreHome;
