@@ -7,19 +7,20 @@ import { StudentData } from "../../../constants/types";
 
 interface StudentProgressProps {
     student: StudentData;
-  }
+    studentKey: string;  
+  } 
   
-export const StudentProgress: React.FC<StudentProgressProps> = ({ student }) => {
+export const StudentProgress: React.FC<StudentProgressProps> = ({ student, studentKey }) => {
     return (
-      <View style={styles.studentContainer}>
+      <View style={styles.studentContainer} key={studentKey}>
         <Text style={styles.studentName}>{student.name}</Text>
-        {Object.entries(student.subjectPoints).map(([subject, points]) => (
+        {Object.entries(student.subjectPoints).map(([subject, points], index) => (
           // subject for multiple students will create multiple views with same keys
-          <View key={student.id + subject} style={styles.subjectProgressContainer}>
+          <View key={subject + student.email + index.toString()} style={styles.subjectProgressContainer}>
             <Text style={styles.subjectName}>{subject}</Text>
-            <ProgressBar count={points} capacity={10}/>
+            <ProgressBar count={points} capacity={10}/> 
           </View>
-        ))}
+        ))} 
       </View>
     );
   };

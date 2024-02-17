@@ -29,17 +29,24 @@ export const ShowClasses: React.FC<ShowClassesProps> = ({ teacherData, navigatio
         >
           <Text style={styles.classText}>{className}</Text>
         </TouchableOpacity>
-      ))}
-    </ScrollView>
+      ))} 
+    </ScrollView> 
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 10,
+    backgroundColor: Colors.background,
+  borderRadius: 8,
+  padding: 15,
+  marginVertical: 8,
+  marginHorizontal: 16,
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.22,
+  shadowRadius: 2.22,
+  elevation: 3,
   },
   headerText: {
     fontSize: 22,
