@@ -9,7 +9,17 @@ import { Auth } from './components/Auth/Auth';
 import { fetchUserData } from './firebase/firestore';
 import { TeacherNav } from './components/Teacher/TeacherNav';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// import { encode, decode } from 'js-base64';
 
+/* if(typeof atob === 'undefined') {
+  global.atob = decode;
+} */
+//  if (!global.btoa) { global.btoa = encode; } if (!global.atob) { global.atob = decode; }
+import { decode } from 'base-64';
+
+if(typeof atob === 'undefined') {
+  global.atob = decode;
+}
 
 export default function App() {
   const [user, setUser] = useState<User>();
