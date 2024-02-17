@@ -35,7 +35,7 @@ export const StudentNav = () => {
             component={StudentHomeStack}
             options={({}) => ({
                 tabBarIcon: ({ color, size }) => (
-                    <MaterialIcons name="star" color={color} size={size} />
+                    <MaterialIcons name="home" color={color} size={size} />
               ),
             })}
           />
@@ -44,7 +44,7 @@ export const StudentNav = () => {
             component={ProfileHomeStack}
             options={() => ({
                 tabBarIcon: ({ color, size }) => (
-                    <MaterialIcons name="star" color={color} size={size} />
+                    <MaterialIcons name="account-circle" color={color} size={size} />
               ),
             })}
           />

@@ -1,33 +1,27 @@
-import React from "react";
-import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+// StudentHome.js
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, SafeAreaView, ScrollView } from "react-native";
 import Subject from "./Subjects/Subject";
 import { SubjectProps } from "./Subjects/Subject";
 import { Colors } from "../../../constants/Colors";
 import { useNavigation } from "@react-navigation/native";
-import { useEffect, useState } from "react";
-import { auth } from "../../../firebase/firebase";
-import {
-  DocumentData,
-  doc,
-  getDoc,
-  getFirestore,
-  updateDoc,
-} from "firebase/firestore";
+import { auth, db } from "../../../firebase/firebase";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { StudentData } from "../../../constants/types";
 
 export const StudentHome: React.FC = () => {
-  
-  const [studentData, setStudentData] = useState<DocumentData>();
+  const [studentData, setStudentData] = useState<StudentData>();
   useEffect(() => {
     const fetchStudentData = async () => {
       const db = getFirestore();
-      const user = auth.currentUser; 
+      const user = auth.currentUser;
 
       if (user) {
-        const docRef = doc(db, "users", user.uid); // Adjust "users" to your collection name
+        const docRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          setStudentData(docSnap.data());
+          setStudentData(docSnap.data() as StudentData);
         } else {
           console.log("No such document!");
         }
@@ -36,43 +30,44 @@ export const StudentHome: React.FC = () => {
 
     fetchStudentData();
   }, []);
-  
-  // hardcoded for now
+
   const navigation = useNavigation();
   const subjects: SubjectProps[] = [
     {
       subjectName: "Mathematics",
-      gradeLevel: studentData?.gradeLevel,
-      subjectColor: Colors.primary,
-      icon: "add"
+      gradeLevel: studentData?.gradeLevel || "1",
+      subjectColor: Colors.accent1,
+      icon: "calculate",
     },
     {
       subjectName: "Science",
-      gradeLevel: studentData?.gradeLevel,
-      subjectColor: Colors.primary,
-      icon: "science"
+      gradeLevel: studentData?.gradeLevel || "1",
+      subjectColor: Colors.accent2,
+      icon: "science",
     },
     {
       subjectName: "History",
-      gradeLevel: studentData?.gradeLevel,
+      gradeLevel: studentData?.gradeLevel || "1",
       subjectColor: Colors.primary,
-      icon:"history-edu"
+      icon: "history",
     },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.text}>Student Home </Text>
-      {subjects.map((subject, index) => (
-        <Subject
-          key={index}
-          subjectName={subject.subjectName}
-          gradeLevel={studentData?.gradeLevel}
-          subjectColor={subject.subjectColor}
-          navigation={navigation}
-          icon={subject.icon}
-        />
-      ))}
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        <Text style={styles.headerText}>Welcome, {studentData?.name}!</Text>
+        {subjects.map((subject, index) => (
+          <Subject
+            key={index}
+            subjectName={subject.subjectName}
+            gradeLevel={subject.gradeLevel}
+            subjectColor={subject.subjectColor}
+            navigation={navigation}
+            icon={subject.icon}
+          />
+        ))}
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -80,14 +75,19 @@ export const StudentHome: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems:"center",
     backgroundColor: Colors.background,
   },
-  text: {
-    fontSize: 40,
+  scrollView: {
+    alignItems: "center",
+    paddingVertical: 20,
+  },
+  headerText: {
+    fontSize: 28,
     fontWeight: "bold",
-    color: "white",
-    marginBottom:30
+    color: Colors.textPrimary,
+    marginBottom: 30,
+    textAlign: "center",
   },
 });
+
+export default StudentHome;
