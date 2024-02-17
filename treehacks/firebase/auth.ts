@@ -43,16 +43,17 @@ export const signUpUser = ({
           email: email,
           username: username,
           accountType: accountType,
-          students: [],
+          classes: [],
           school: "",
         }).catch((error: FirebaseError) => authError(error, setError));
       } else if (accountType === "Student") {
         setDoc(doc(db, "users", userCredential.user.uid), {
+          id: userCredential.user.uid,
           name: name,
           email: email,
           username: username,
           accountType: accountType,
-          class: "",
+          classes: [],
           points: 0,
           subjectPoints: {
             mathPoints: 0,

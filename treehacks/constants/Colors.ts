@@ -5,4 +5,5 @@ export const Colors = {
   blue: "blue",
   red: "red",
   green: "green",
+  lightgray: "lightgray",
 };

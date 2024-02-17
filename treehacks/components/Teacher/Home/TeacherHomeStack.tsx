@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { TeacherHome } from "./TeacherHome";
 import { Colors } from "../../../constants/Colors";
+import { ShowStudents } from "./ShowStudents";
 
 const Stack = createStackNavigator();
 
@@ -10,7 +11,7 @@ export const TeacherHomeStack = () => {
   
   return (
     <Stack.Navigator
-      initialRouteName="TeacherHome"
+      initialRouteName="Home"
       screenOptions={{
         gestureEnabled: true,
         gestureDirection: "horizontal",
@@ -20,7 +21,8 @@ export const TeacherHomeStack = () => {
         headerStyle: { backgroundColor: Colors.secondary },
       }}
     >
-      <Stack.Screen name="TeacherHome" component={TeacherHome} />
+      <Stack.Screen name="Home" component={TeacherHome} />
+      <Stack.Screen name="Manage Students" component={ShowStudents} />
     </Stack.Navigator>
   );
 };
