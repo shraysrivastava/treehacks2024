@@ -18,6 +18,7 @@ type SignUpProps = {
 export const SignUp = (props: SignUpProps) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -43,6 +44,8 @@ export const SignUp = (props: SignUpProps) => {
       setError("name cannot be empty");
     } else if (password !== confirmPassword) {
       setError("passwords do not match");
+    } else if (username === "") {
+      setError("username cannot be empty");
     } else if (accountType === "") {
       //error check that user type is not empty
       setError("Please select account type");
@@ -68,6 +71,12 @@ export const SignUp = (props: SignUpProps) => {
         value={name}
         placeholder="Name"
         onChangeText={(text) => setName(text)}
+      />
+      <TextInput
+        style={styles.TextInput}
+        value={username}
+        placeholder="Username"
+        onChangeText={(text) => setUsername(text)}
       />
       <TextInput
         style={styles.TextInput}
