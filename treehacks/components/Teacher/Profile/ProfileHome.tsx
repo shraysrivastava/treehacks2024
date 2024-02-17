@@ -4,7 +4,7 @@ import { signOutUser } from "../../../firebase/auth";
 
 export const ProfileHome = () => {
   const [error, setError] = useState('');
-
+  
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.text}>Profile Home</Text>
