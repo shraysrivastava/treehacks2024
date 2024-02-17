@@ -64,8 +64,9 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
   const fetchStudentData = useCallback(async () => {
     if (!teacherData) { return null;}
     const studentEmails = teacherData.classes[className];
-    // console.log(studentEmails);
+    console.log(studentEmails);
     if (studentEmails && studentEmails.length > 0) {
+
       const studentsQuery = query(
         collection(db, "users"),
         where("email", "in", studentEmails)
@@ -77,7 +78,7 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
           ...doc.data(),
           id: doc.id,
         })) as StudentData[];
-
+        console.log("FS"+fetchedStudents.length);
         setStudentData(fetchedStudents);
       } catch (err) {
         console.error("Error fetching students: ", err);
@@ -88,19 +89,14 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
   
 
 
-    const fetchData = () => {
-      fetchTeacherData()
-        .then(fetchStudentData)
-        .catch((err) => {
-          console.error("Error fetching data: ", err);
-        });
-    };
-
-    useEffect(() => {
-      fetchData();
-    }, [teacherData, className, studentData]);
-
-
+  useEffect(() => {
+    const fetchData = async () => {
+        await fetchTeacherData();
+        await fetchStudentData();
+    }
+    fetchData()
+    // console.log(studentData);
+  }, []);
 
   useEffect(() => {
     if (toast.message !== "") {
@@ -116,12 +112,15 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
     };
   }, [toast.message]);
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    fetchTeacherData();
-    fetchStudentData().finally(() => setRefreshing(false));
+    await fetchTeacherData();
+    console.log("FTD: "+ teacherData?.classes["Grade 1"][0]);
+    await fetchStudentData();
+    console.log("FSD: "+ studentData.length);
+    setRefreshing(false);
     
-  }, [fetchStudentData, fetchTeacherData, refreshing, setRefreshing]);
+  }, [ refreshing, teacherData]);
 
   const isValidEmail = () => {
     const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/; // Simple regex for email validation
@@ -165,9 +164,7 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
   
       // Append the student's email to the array
       studentsArray.push(email);
-      // log the studentsArray and the userData as a json
-      //console.log(studentsArray);
-      //console.log(userData);
+  
       // Update the classes map with the new array of students
       await updateDoc(userDocRef, {
         [`classes.${className}`]: studentsArray // Use the dot notation to update a specific field within a map
@@ -175,17 +172,14 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
   
       console.log("Student added to class successfully");
       setToast({ message: "Student added to class successfully", color: Colors.toastSuccess });
-      // await fetchStudentData(); // Refresh to reflect the update
-      // await fetchTeacherData();
-      
-      onRefresh();
+      fetchStudentData(); // Refresh to reflect the update
     } catch (err) {
       console.error("Transaction failed: ", err);
       setToast({ message: "Transaction failed", color: Colors.toastError });
     }
   };
   
-  
+  console.log("SD: "+ studentData.length);
 
   return (
     <View style={styles.container}>
@@ -217,7 +211,7 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
 
       {studentData.length > 0 ? (
         studentData.map((student, index) => (
-            <StudentProgress key={student.id} student={student}/>
+            <StudentProgress student={student}/>
         ))
       ) : (
         <Text style={styles.text}>

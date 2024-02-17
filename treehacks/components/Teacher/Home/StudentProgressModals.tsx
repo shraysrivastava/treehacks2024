@@ -14,7 +14,8 @@ export const StudentProgress: React.FC<StudentProgressProps> = ({ student }) => 
       <View style={styles.studentContainer}>
         <Text style={styles.studentName}>{student.name}</Text>
         {Object.entries(student.subjectPoints).map(([subject, points]) => (
-          <View key={subject} style={styles.subjectProgressContainer}>
+          // subject for multiple students will create multiple views with same keys
+          <View key={student.id + subject} style={styles.subjectProgressContainer}>
             <Text style={styles.subjectName}>{subject}</Text>
             <ProgressBar count={points} capacity={10}/>
           </View>
