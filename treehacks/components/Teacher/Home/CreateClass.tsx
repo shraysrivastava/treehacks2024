@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   cancelButton: {
-    backgroundColor: Colors.secondary,
+    backgroundColor: Colors.lightgray,
   },
   confirmButton: {
     backgroundColor: Colors.primary,

@@ -29,9 +29,9 @@ import { StudentProgress } from "./StudentProgressModals";
 
 interface ShowStudentsProps {
   route: RouteProp<
-    { params: { className: string; teacherData: TeacherData } },
+    { params: { className: string } },
     "params"
-  >;
+  >; 
 }
 export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
   const { className } = route.params;
@@ -41,62 +41,46 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [email, setEmail] = useState("");
   const [toast, setToast] = useState<ToastProps>({ message: "", color: "" });
-  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null); 
 
-  const fetchTeacherData = useCallback(async () => {
-    const user = auth.currentUser;
-
-    if (user) {
+  const fetchTeacherData = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error("Authentication required");
       const docRef = doc(db, "users", user.uid);
       const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        // Cast the document data to TeacherData
-        // console.log("Document data:", docSnap.data());
-        setTeacherData(docSnap.data() as TeacherData);
-        
-      } else {
-        console.log("No such document!");
-      }
+      if (!docSnap.exists()) throw new Error("No such document!");
+      setTeacherData(docSnap.data() as TeacherData);
+    } catch (error) {
+      console.error("Fetch teacher data failed:", error);
+      setToast({ message: "Failed to fetch teacher data", color: "red" });
     }
-  }, [teacherData, className, studentData]);
+  };
 
   const fetchStudentData = useCallback(async () => {
-    if (!teacherData) { return null;}
-    const studentEmails = teacherData.classes[className];
-    console.log(studentEmails);
-    if (studentEmails && studentEmails.length > 0) {
-
-      const studentsQuery = query(
-        collection(db, "users"),
-        where("email", "in", studentEmails)
-      );
-
-      try {
-        const querySnapshot = await getDocs(studentsQuery);
-        const fetchedStudents = querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        })) as StudentData[];
-        console.log("FS"+fetchedStudents.length);
-        setStudentData(fetchedStudents);
-      } catch (err) {
-        console.error("Error fetching students: ", err);
-      }
+    try {
+      if (!teacherData) return;
+      const studentEmails = teacherData.classes[className];
+      if (!studentEmails || studentEmails.length === 0) return;
+      const studentsQuery = query(collection(db, "users"), where("email", "in", studentEmails));
+      const querySnapshot = await getDocs(studentsQuery);
+      const fetchedStudents = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as StudentData[];
+      setStudentData(fetchedStudents);
+    } catch (error) {
+      console.error("Error fetching students:", error);
+      setToast({ message: "Failed to fetch students", color: "red" });
     }
-  }, [className, studentData, teacherData]);
-  
-  
-
+  }, [className, teacherData]);
 
   useEffect(() => {
-    const fetchData = async () => {
-        await fetchTeacherData();
-        await fetchStudentData();
-    }
-    fetchData()
-    // console.log(studentData);
-  }, []);
+    fetchStudentData();
+  }, [fetchStudentData]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchTeacherData().then(fetchStudentData).finally(() => setRefreshing(false));
+  }, [fetchStudentData]);
 
   useEffect(() => {
     if (toast.message !== "") {
@@ -104,23 +88,13 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
         setToast({ message: "", color: "" });
       }, 2000);
     }
-  
+
     return () => {
       if (toastTimeoutRef.current) {
         clearTimeout(toastTimeoutRef.current);
       }
     };
   }, [toast.message]);
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await fetchTeacherData();
-    console.log("FTD: "+ teacherData?.classes["Grade 1"][0]);
-    await fetchStudentData();
-    console.log("FSD: "+ studentData.length);
-    setRefreshing(false);
-    
-  }, [ refreshing, teacherData]);
 
   const isValidEmail = () => {
     const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/; // Simple regex for email validation
@@ -150,29 +124,44 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
         return;
       }
   
-      // Check if the document data has the classes map and the specific class
       const userData = docSnap.data();
       const classesMap = userData.classes || {};
       const studentsArray = classesMap[className] || [];
   
-      // Check if the student is already in the class
       if (studentsArray.includes(email)) {
         console.log("Student already in class");
         setToast({ message: "Student already in class", color: Colors.toastError });
         return;
       }
   
-      // Append the student's email to the array
       studentsArray.push(email);
   
       // Update the classes map with the new array of students
       await updateDoc(userDocRef, {
-        [`classes.${className}`]: studentsArray // Use the dot notation to update a specific field within a map
+        [`classes.${className}`]: studentsArray
       });
   
+      // Now, find and update the student's document with the new course
+      const studentsQuery = query(collection(db, "users"), where("email", "==", email));
+      const querySnapshot = await getDocs(studentsQuery);
+  
+      if (!querySnapshot.empty) {
+        const studentDocRef = querySnapshot.docs[0].ref; // Assuming email is unique, there should only be one document
+        const courseName = `${userData.name}-${className}`; // Format: teacherName-courseName
+  
+        await updateDoc(studentDocRef, {
+          classes: arrayUnion(courseName)
+        });
+      } else {
+        console.log("Student not found");
+        setToast({ message: "Student not found", color: Colors.toastError });
+        return;
+      }
+  
       console.log("Student added to class successfully");
+      setEmail("");
       setToast({ message: "Student added to class successfully", color: Colors.toastSuccess });
-      fetchStudentData(); // Refresh to reflect the update
+       // Refresh to reflect the update
     } catch (err) {
       console.error("Transaction failed: ", err);
       setToast({ message: "Transaction failed", color: Colors.toastError });
@@ -183,35 +172,40 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
 
   return (
     <View style={styles.container}>
-    <ScrollView
-      contentContainerStyle={styles.container}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          colors={[Colors.secondary]}
-          tintColor={Colors.secondary}
-          progressBackgroundColor="#ffffff"
-        />
-      }
-    >
-      <Text style={styles.headerText}>Class: {className}</Text>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.TextInput}
-          placeholder="Email"
-          autoCapitalize="none"
-          keyboardType="email-address"
-          onChangeText={(text) => setEmail(text)}
-        />
-        <TouchableOpacity style={styles.addButton} onPress={addStudentToClass}>
-          <MaterialIcons name="add" size={24} color={Colors.background} />
-        </TouchableOpacity>
-      </View>
-
+      <ScrollView
+        contentContainerStyle={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[Colors.secondary]}
+            tintColor={Colors.secondary}
+            progressBackgroundColor="#ffffff"
+          />
+        }
+      >
+        <Text style={styles.headerText}>Class: {className}</Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.TextInput}
+            placeholder="Email"
+            autoCapitalize="none"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+            
+          /> 
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={addStudentToClass}
+          >
+            <MaterialIcons name="add" size={24} color={Colors.background} />
+          </TouchableOpacity>
+        </View>
+ 
       {studentData.length > 0 ? (
         studentData.map((student, index) => (
-            <StudentProgress student={student}/>
+            <StudentProgress student={student} studentKey={student.id + index.toString() + student.email}/>
         ))
       ) : (
         <Text style={styles.text}>
