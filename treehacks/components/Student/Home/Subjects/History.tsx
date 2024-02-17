@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from "react";
 import {
   View,
@@ -259,3 +260,15 @@ const styles = StyleSheet.create({
     color: Colors.secondary,
   },
 });
+=======
+import { View, Text } from 'react-native'
+import React from 'react'
+
+export const History = () => {
+    return (
+    <View>
+      <Text>History</Text>
+    </View>
+  )
+}
+>>>>>>> b7b8011 (Cat generator)

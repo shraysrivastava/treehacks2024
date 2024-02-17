@@ -18,7 +18,11 @@ export const RewardStoreStack = () => {
                         headerBackTitleVisible: false,
                         headerStyle: { backgroundColor: Colors.primary },
                     }}>
+<<<<<<< HEAD
             <Stack.Screen name="Redeem NFTs with your points!" component={RewardStoreHome} />
+=======
+            <Stack.Screen name="RewardStoreHome" component={RewardStoreHome} />
+>>>>>>> b7b8011 (Cat generator)
         </Stack.Navigator>
     );
 };

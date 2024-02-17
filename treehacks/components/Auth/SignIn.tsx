@@ -40,7 +40,11 @@ export const SignIn = (props: SignInProps) => {
           </Text>
       </TouchableOpacity>
       <View style={styles.container}>
+<<<<<<< HEAD
         <Text style={{color: Colors.textPrimary}}>Don't have an account? </Text>
+=======
+        <Text>Don't have an account? </Text>
+>>>>>>> b7b8011 (Cat generator)
         <Text
             style={styles.changeText} 
             onPress={(event) => {props.setHasAccount(false);}}>
@@ -67,18 +71,30 @@ const styles = StyleSheet.create({
   signInText: {
     fontSize: 27,
     fontWeight: 'bold',
+<<<<<<< HEAD
     color: Colors.textPrimary,
     marginBottom: 10,
   },
   changeText: {
     color: Colors.accent1,
+=======
+    color: 'black',
+    marginBottom: 10,
+  },
+  changeText: {
+    color: "blue",
+>>>>>>> b7b8011 (Cat generator)
   },
   TextInput: {
     width: 250,
     height: 40,
     borderWidth: 1,
     borderColor: 'lightgray',
+<<<<<<< HEAD
     backgroundColor: "white",
+=======
+    backgroundColor: 'white',
+>>>>>>> b7b8011 (Cat generator)
     padding: 5,
     margin: 5,
     borderRadius: 5,
@@ -88,7 +104,11 @@ const styles = StyleSheet.create({
     margin: 5,
     padding: 10,
     alignItems: 'center',
+<<<<<<< HEAD
     backgroundColor: Colors.primary,
+=======
+    backgroundColor: "purple",
+>>>>>>> b7b8011 (Cat generator)
     borderRadius: 10,
   },
   ButtonText: {
@@ -105,4 +125,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginLeft: 30,
   },
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> b7b8011 (Cat generator)

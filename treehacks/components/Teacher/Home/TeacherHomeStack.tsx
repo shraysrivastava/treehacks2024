@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+<<<<<<< HEAD
 import {
   createStackNavigator,
   StackNavigationProp,
@@ -23,6 +24,16 @@ export type TeacherHomeNavigationProps =
 const Stack = createStackNavigator<TeacherHomeStackParamsList>();
 
 export const TeacherHomeStack: React.FC = () => {
+=======
+import { createStackNavigator } from "@react-navigation/stack";
+import { TeacherHome } from "./TeacherHome";
+import { Colors } from "../../../constants/Colors";
+
+const Stack = createStackNavigator();
+
+export const TeacherHomeStack = () => {
+  
+>>>>>>> b7b8011 (Cat generator)
   return (
     <Stack.Navigator
       initialRouteName="TeacherHome"
@@ -36,12 +47,16 @@ export const TeacherHomeStack: React.FC = () => {
       }}
     >
 <<<<<<< HEAD
+<<<<<<< HEAD
       <Stack.Screen name="Home" component={TeacherHome} />
       <Stack.Screen name="Manage Students" component={ShowStudents} />
       <Stack.Screen name="CreateCourse" component={CreateCourse} />
 =======
       <Stack.Screen name="TeacherHome" component={TeacherHome} />
 >>>>>>> 2142e63 (Cat generator)
+=======
+      <Stack.Screen name="TeacherHome" component={TeacherHome} />
+>>>>>>> b7b8011 (Cat generator)
     </Stack.Navigator>
   );
 };

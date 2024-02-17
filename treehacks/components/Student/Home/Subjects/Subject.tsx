@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -8,6 +9,16 @@ export type SubjectProps = {
   subjectColor: string;
   navigation?: any;
   icon: any;
+=======
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React from "react";
+
+export type SubjectProps = {
+  subjectName: string;
+  gradeLevel: number;
+  subjectColor: string;
+  navigation?: any;
+>>>>>>> b7b8011 (Cat generator)
 };
 
 const Subject = ({
@@ -15,13 +26,17 @@ const Subject = ({
   gradeLevel,
   subjectColor,
   navigation,
+<<<<<<< HEAD
   icon
+=======
+>>>>>>> b7b8011 (Cat generator)
 }: SubjectProps) => {
   return (
     <TouchableOpacity
       style={[styles.container, { backgroundColor: subjectColor }]}
       onPress={() => navigation.navigate(subjectName)}
     >
+<<<<<<< HEAD
       <View style={styles.iconContainer}>
         <MaterialIcons name={icon} size={40} color="white" />
       </View>
@@ -29,12 +44,17 @@ const Subject = ({
         <Text style={styles.subjectText}>{subjectName}</Text>
         <Text style={styles.gradeText}>Grade: {gradeLevel}</Text>
       </View>
+=======
+      <Text style={styles.text}>{subjectName}</Text>
+      <Text style={styles.text}>Grade Level: {gradeLevel}</Text>
+>>>>>>> b7b8011 (Cat generator)
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+<<<<<<< HEAD
     flexDirection: "row",
     width: '95%',
     alignSelf: 'center',
@@ -70,6 +90,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 5,
   },
+=======
+    width: 400,
+    height: 100,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    opacity: 0.7,
+  },
+  text: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+>>>>>>> b7b8011 (Cat generator)
 });
 
 export default Subject;
