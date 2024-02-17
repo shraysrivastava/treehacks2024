@@ -45,7 +45,7 @@ export default function App() {
   } else {
     if (userData === undefined) {
       fetchUserData(user, setUserData);
-      console.log(userData);
+      // console.log(userData);
       return (
         <View style={styles.container}>
           <Text>Loading</Text>
