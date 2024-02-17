@@ -150,7 +150,7 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
         const courseName = `${userData.name}-${className}`; // Format: teacherName-courseName
   
         await updateDoc(studentDocRef, {
-          courses: arrayUnion(courseName)
+          classes: arrayUnion(courseName)
         });
       } else {
         console.log("Student not found");
@@ -161,7 +161,7 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
       console.log("Student added to class successfully");
       setEmail("");
       setToast({ message: "Student added to class successfully", color: Colors.toastSuccess });
-      fetchStudentData(); // Refresh to reflect the update
+       // Refresh to reflect the update
     } catch (err) {
       console.error("Transaction failed: ", err);
       setToast({ message: "Transaction failed", color: Colors.toastError });
@@ -205,7 +205,7 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
  
       {studentData.length > 0 ? (
         studentData.map((student, index) => (
-            <StudentProgress student={student} studentKey={student.id + index.toString()}/>
+            <StudentProgress student={student} studentKey={student.id + index.toString() + student.email}/>
         ))
       ) : (
         <Text style={styles.text}>
