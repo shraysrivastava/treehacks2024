@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-nati
 import { TeacherData } from "../../../constants/types";
 import { Colors } from "../../../constants/Colors";
 import { NavigationProp } from '@react-navigation/native';
+import { CreateCourse } from "./CreateCourse";
 
 interface ShowClassesProps {
   teacherData: TeacherData;
@@ -29,7 +30,7 @@ export const ShowClasses: React.FC<ShowClassesProps> = ({ teacherData, navigatio
         >
           <Text style={styles.classText}>{className}</Text>
         </TouchableOpacity>
-      ))} 
+      ))}
     </ScrollView> 
   );
 };

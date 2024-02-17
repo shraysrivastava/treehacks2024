@@ -3,79 +3,133 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
+  Button,
   StyleSheet,
+  TouchableOpacity,
 } from "react-native";
-import { addDoc, collection } from "firebase/firestore";
-import { getFirestore } from "../../../firebase/firebase";
+import { db } from "../../../firebase/firebase";
+import {
+  DocumentData,
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { RouteProp } from "@react-navigation/native";
 
-export const CreateCourse = () => {
-  const [question, setQuestion] = useState("");
-  const [correctAnswer, setCorrectAnswer] = useState("");
-  const [wrongAnswer1, setWrongAnswer1] = useState("");
-  const [wrongAnswer2, setWrongAnswer2] = useState("");
-  const [wrongAnswer3, setWrongAnswer3] = useState("");
+interface Question {
+  question: string;
+  answer: string;
+  wrongAnswer1: string;
+  wrongAnswer2: string;
+  wrongAnswer3: string;
+}
+interface CreateClassProps {
+  route: RouteProp<{ params: { coursePath: string } }, "params">;
+}
 
-  const handleSubmit = async () => {
+export const CreateCourse: React.FC<CreateClassProps> = ({ route }) => {
+  const { coursePath } = route.params;
+  const [courseName, setCourseName] = useState<string>("");
+  const [question, setQuestion] = useState<string>("");
+  const [answer, setAnswer] = useState<string>("");
+  const [wrongAnswer1, setWrongAnswer1] = useState<string>("");
+  const [wrongAnswer2, setWrongAnswer2] = useState<string>("");
+  const [wrongAnswer3, setWrongAnswer3] = useState<string>("");
+  const [questions, setQuestions] = useState<Question[]>([]);
+
+  const handleAddQuestion = () => {
+    const newQuestion: Question = {
+      question,
+      answer,
+      wrongAnswer1,
+      wrongAnswer2,
+      wrongAnswer3,
+    };
+    setQuestions([...questions, newQuestion]);
+    // Clear fields after adding question
+    setQuestion("");
+    setAnswer("");
+    setWrongAnswer1("");
+    setWrongAnswer2("");
+    setWrongAnswer3("");
+  };
+
+  const handleCreateCourse = async () => {
     try {
-      const db = getFirestore();
-      const coursesRef = collection(db, "courses");
-      await addDoc(coursesRef, {
-        question,
-        correctAnswer,
-        wrongAnswers: [wrongAnswer1, wrongAnswer2, wrongAnswer3],
-      });
-      // Clear form fields after submission
-      setQuestion("");
-      setCorrectAnswer("");
-      setWrongAnswer1("");
-      setWrongAnswer2("");
-      setWrongAnswer3("");
-      alert("Course created successfully!");
+      const courseData = {
+        courseName,
+        questions,
+      };
+      const docRef = doc(db, "courses", coursePath + "-" + courseName);
+      console.log("Document written with ID: ", docRef.id);
+      await setDoc(docRef, { courseData });
+      // Clear fields after creating course
+      setCourseName("");
+      setQuestions([]);
     } catch (error) {
-      console.error("Error creating course:", error);
-      alert("Failed to create course. Please try again.");
+      console.error("Error adding document: ", error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Question</Text>
-      <TextInput
-        style={styles.input}
-        value={question}
-        onChangeText={setQuestion}
-        placeholder="Enter your question"
-      />
-      <Text style={styles.label}>Correct Answer</Text>
-      <TextInput
-        style={styles.input}
-        value={correctAnswer}
-        onChangeText={setCorrectAnswer}
-        placeholder="Enter the correct answer"
-      />
-      <Text style={styles.label}>Wrong Answer 1</Text>
-      <TextInput
-        style={styles.input}
-        value={wrongAnswer1}
-        onChangeText={setWrongAnswer1}
-        placeholder="Enter a wrong answer"
-      />
-      <Text style={styles.label}>Wrong Answer 2</Text>
-      <TextInput
-        style={styles.input}
-        value={wrongAnswer2}
-        onChangeText={setWrongAnswer2}
-        placeholder="Enter another wrong answer"
-      />
-      <Text style={styles.label}>Wrong Answer 3</Text>
-      <TextInput
-        style={styles.input}
-        value={wrongAnswer3}
-        onChangeText={setWrongAnswer3}
-        placeholder="Enter another wrong answer"
-      />
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+      <View style={styles.questionContainer}>
+        <Text style={styles.label}>Course Name:</Text>
+        <TextInput
+          value={courseName}
+          onChangeText={setCourseName}
+          style={styles.input}
+        />
+      </View>
+      <View style={styles.questionContainer}>
+        <Text style={styles.label}>Question:</Text>
+        <TextInput
+          value={question}
+          onChangeText={setQuestion}
+          style={styles.input}
+        />
+      </View>
+      <View style={styles.questionContainer}>
+        <Text style={styles.label}>Answer:</Text>
+        <TextInput
+          value={answer}
+          onChangeText={setAnswer}
+          style={styles.input}
+        />
+      </View>
+      <View style={styles.questionContainer}>
+        <Text style={styles.label}>Wrong Answer 1:</Text>
+        <TextInput
+          value={wrongAnswer1}
+          onChangeText={setWrongAnswer1}
+          style={styles.input}
+        />
+      </View>
+      <View style={styles.questionContainer}>
+        <Text style={styles.label}>Wrong Answer 2:</Text>
+        <TextInput
+          value={wrongAnswer2}
+          onChangeText={setWrongAnswer2}
+          style={styles.input}
+        />
+      </View>
+      <View style={styles.questionContainer}>
+        <Text style={styles.label}>Wrong Answer 3:</Text>
+        <TextInput
+          value={wrongAnswer3}
+          onChangeText={setWrongAnswer3}
+          style={styles.input}
+        />
+      </View>
+      <TouchableOpacity style={styles.button} onPress={handleAddQuestion}>
+        <Text style={styles.buttonText}>Add Question</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={handleCreateCourse}>
         <Text style={styles.buttonText}>Create Course</Text>
       </TouchableOpacity>
     </View>
@@ -86,6 +140,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+  },
+  questionContainer: {
+    marginBottom: 20,
   },
   label: {
     fontSize: 16,
@@ -103,9 +160,12 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
+    marginBottom: 10,
   },
   buttonText: {
     color: "white",
     fontSize: 16,
   },
 });
+
+export default CreateCourse;

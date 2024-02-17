@@ -1,14 +1,28 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { createStackNavigator } from "@react-navigation/stack";
+import {
+  createStackNavigator,
+  StackNavigationProp,
+} from "@react-navigation/stack";
 import { TeacherHome } from "./TeacherHome";
 import { Colors } from "../../../constants/Colors";
 import { ShowStudents } from "./ShowStudents";
+import { CreateCourse } from "./CreateCourse";
 
-const Stack = createStackNavigator();
+// Define types for navigation parameters
+type TeacherHomeStackParamsList = {
+  Home: undefined;
+  "Manage Students": undefined;
+  CreateCourse: { coursePath: string };
+};
 
-export const TeacherHomeStack = () => {
-  
+// Define props type for navigation
+export type TeacherHomeNavigationProps =
+  StackNavigationProp<TeacherHomeStackParamsList>;
+
+const Stack = createStackNavigator<TeacherHomeStackParamsList>();
+
+export const TeacherHomeStack: React.FC = () => {
   return (
     <Stack.Navigator
       initialRouteName="Home"
@@ -23,6 +37,7 @@ export const TeacherHomeStack = () => {
     >
       <Stack.Screen name="Home" component={TeacherHome} />
       <Stack.Screen name="Manage Students" component={ShowStudents} />
+      <Stack.Screen name="CreateCourse" component={CreateCourse} />
     </Stack.Navigator>
   );
 };
