@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   text: {
-    fontSize: 20,
+    fontSize: 40,
     fontWeight: "bold",
     color: "white",
     marginBottom:30

@@ -6,6 +6,8 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import { auth } from "../../../../firebase/firebase";
@@ -149,12 +151,9 @@ export const Mathematics = () => {
   };
 
   return (
-    <>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Text style={styles.header}>Math Quiz</Text>
-        <Text style={styles.gradeLevel}>
-          Grade Level: {studentData?.gradeLevel}
-        </Text>
+        <Text style={styles.header}>What is...</Text>
         <Text style={styles.question}>
           {operand1} {operator} {operand2} =
         </Text>
@@ -170,8 +169,7 @@ export const Mathematics = () => {
         </TouchableOpacity>
         <Text style={styles.result}>{correctAnswer}</Text>
       </View>
-      <CustomToast message={toast.message} color={toast.color} />
-    </>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -232,4 +230,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: Colors.primary,
   },
+  dismissButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    zIndex: 1,
+  },
+  dismissButtonText: {
+    fontSize: 18,
+    color: Colors.secondary
+  }
 });
