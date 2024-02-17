@@ -1,11 +1,13 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export type SubjectProps = {
   subjectName: string;
   gradeLevel: number;
   subjectColor: string;
   navigation?: any;
+  icon: any;
 };
 
 const Subject = ({
@@ -13,6 +15,7 @@ const Subject = ({
   gradeLevel,
   subjectColor,
   navigation,
+  icon
 }: SubjectProps) => {
   return (
     <TouchableOpacity
@@ -21,6 +24,7 @@ const Subject = ({
     >
       <Text style={styles.text}>{subjectName}</Text>
       <Text style={styles.text}>Grade Level: {gradeLevel}</Text>
+      <MaterialIcons name={icon} size={24} color="black" />
     </TouchableOpacity>
   );
 };
@@ -32,7 +36,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    opacity: 0.7,
+    opacity: 1,
+    marginBottom:20
   },
   text: {
     color: "white",

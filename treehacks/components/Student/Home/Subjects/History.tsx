@@ -20,7 +20,6 @@ import {
 import { auth } from "../../../../firebase/firebase";
 import { Colors } from "../../../../constants/Colors";
 import CustomToast, { ToastProps } from "../../../../constants/Toast";
-
 const { width } = Dimensions.get("window");
 
 export const History = () => {
