@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { StudentHome } from "./StudentHome";
 import { Colors } from "../../../constants/Colors";
-import { Math } from "./Subjects/Math";
+import { Mathematics } from "./Subjects/Mathematics";
 import { Science } from "./Subjects/Science";
 import { History } from "./Subjects/History";
 
@@ -23,7 +23,7 @@ export const StudentHomeStack = () => {
       }}
     >
       <Stack.Screen name="StudentHome" component={StudentHome} />
-      <Stack.Screen name="Math" component={Math} />
+      <Stack.Screen name="Mathematics" component={Mathematics} />
       <Stack.Screen name="Science" component={Science} />
       <Stack.Screen name="History" component={History} />
     </Stack.Navigator>

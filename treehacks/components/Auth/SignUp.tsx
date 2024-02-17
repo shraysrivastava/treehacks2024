@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { signUpUser } from '../../firebase/auth';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import DropDownPicker from 'react-native-dropdown-picker';
-import {Colors} from '../../constants/Colors';
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { signUpUser } from "../../firebase/auth";
+import { SafeAreaView } from "react-native-safe-area-context";
+import DropDownPicker from "react-native-dropdown-picker";
+import { Colors } from "../../constants/Colors";
 
 type SignUpProps = {
   setHasAccount: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
+};
 
 export const SignUp = (props: SignUpProps) => {
-
-
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -20,12 +23,21 @@ export const SignUp = (props: SignUpProps) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [userOpen, setuserOpen] = useState(false);
-  const [userValue, setuserValue] = useState("");
+  const [accountType, setaccountType] = useState("");
   const [user, setUser] = useState([
     { label: "Teacher", value: "Teacher" },
     { label: "Student", value: "Student" },
   ]);
 
+  const [gradeOpen, setgradeOpen] = useState(false);
+  const [gradeLevel, setgradeLevel] = useState("");
+  const [userGrade, setUserGrade] = useState([
+    { label: "First Grade", value: "1" },
+    { label: "Second Grade", value: "2" },
+    { label: "Third Grade", value: "3" },
+    { label: "Fourth Grade", value: "4" },
+    { label: "Fifth Grade", value: "5" },
+  ]);
 
   const handleSignUp = () => {
     if (name === "") {
@@ -34,15 +46,23 @@ export const SignUp = (props: SignUpProps) => {
       setError("passwords do not match");
     } else if (username === "") {
       setError("username cannot be empty");
-    } else if (userValue === "") {
+    } else if (accountType === "") {
       //error check that user type is not empty
-      setError("Please select user type")
+      setError("Please select account type");
+    } else if (gradeLevel === "") {
+      setError("Please select a grade level");
+    } else {
+      signUpUser({
+        name,
+        username,
+        email,
+        password,
+        accountType,
+        gradeLevel,
+        setError,
+      });
     }
-    else {
-      signUpUser(name, username, email, password, userValue, setError);
-    }
-  }
-
+  };
 
   return (
     <SafeAreaView style={styles.parentContainer}>
@@ -64,7 +84,7 @@ export const SignUp = (props: SignUpProps) => {
         value={email}
         placeholder="Email"
         autoCapitalize="none"
-        keyboardType='email-address'
+        keyboardType="email-address"
         onChangeText={(text) => setEmail(text)}
       />
       <TextInput
@@ -85,29 +105,40 @@ export const SignUp = (props: SignUpProps) => {
       <View style={styles.dropdownContainer}>
         <DropDownPicker
           open={userOpen}
-          value={userValue} //userValue
+          value={accountType} //userValue
           items={user}
           style={styles.dropdown}
           setOpen={setuserOpen}
-          setValue={setuserValue}
+          setValue={setaccountType}
           setItems={setUser}
           placeholder="Select User Type"
           activityIndicatorColor="#5188E3"
         />
       </View>
-      <TouchableOpacity
-        style={styles.Button}
-        onPress={handleSignUp}>
-        <Text
-          style={styles.ButtonText}>
-          Sign Up
-        </Text>
+      <View style={styles.dropdownContainer}>
+        <DropDownPicker
+          open={gradeOpen}
+          value={gradeLevel} //userValue
+          items={userGrade}
+          style={styles.dropdown}
+          setOpen={setgradeOpen}
+          setValue={setgradeLevel}
+          setItems={setUserGrade}
+          placeholder="Select Grade Level"
+          activityIndicatorColor="#5188E3"
+        />
+      </View>
+      <TouchableOpacity style={styles.Button} onPress={handleSignUp}>
+        <Text style={styles.ButtonText}>Sign Up</Text>
       </TouchableOpacity>
       <View style={styles.container}>
         <Text> Have an account? </Text>
         <Text
           style={styles.changeText}
-          onPress={(event) => { props.setHasAccount(true); }}>
+          onPress={(event) => {
+            props.setHasAccount(true);
+          }}
+        >
           Sign In
         </Text>
       </View>
@@ -116,10 +147,9 @@ export const SignUp = (props: SignUpProps) => {
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: "row",
     // justifyContent: 'center',
     margin: 5,
   },
@@ -130,7 +160,7 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     // flexDirection: '',
-    justifyContent: 'center',
+    justifyContent: "center",
     marginBottom: 30,
     marginRight: 75,
     marginLeft: 75,
@@ -139,16 +169,16 @@ const styles = StyleSheet.create({
   },
   parentContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
     backgroundColor: Colors.background,
   },
   signUpText: {
     marginTop: 20,
     fontSize: 27,
-    fontWeight: 'bold',
-    color: 'black',
+    fontWeight: "bold",
+    color: "black",
     marginBottom: 10,
   },
   changeText: {
@@ -159,8 +189,8 @@ const styles = StyleSheet.create({
     width: 250,
     height: 40,
     borderWidth: 1,
-    borderColor: 'lightgray',
-    backgroundColor: 'white',
+    borderColor: "lightgray",
+    backgroundColor: "white",
     padding: 10,
     margin: 5,
     borderRadius: 5,
@@ -170,16 +200,16 @@ const styles = StyleSheet.create({
     margin: 5,
     marginTop: 10,
     padding: 10,
-    alignItems: 'center',
+    alignItems: "center",
     backgroundColor: "purple",
     borderRadius: 10,
   },
   ButtonText: {
-    color: 'white',
+    color: "white",
   },
   ErrorText: {
-    textAlign: 'center',
-    color: 'red',
+    textAlign: "center",
+    color: "red",
   },
   dropdown: {
     width: 250,
@@ -188,8 +218,6 @@ const styles = StyleSheet.create({
     marginBottom: 100,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: 'lightgray',
-    
+    borderColor: "lightgray",
   },
 });
-
