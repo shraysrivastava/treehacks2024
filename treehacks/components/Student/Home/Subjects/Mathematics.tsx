@@ -1,5 +1,13 @@
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
-import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
+import React, { useState, useEffect, useRef } from "react";
 import { auth } from "../../../../firebase/firebase";
 import {
   DocumentData,
@@ -8,6 +16,9 @@ import {
   getFirestore,
   updateDoc,
 } from "firebase/firestore";
+import { Colors } from "../../../../constants/Colors";
+import CustomToast, { ToastProps } from "../../../../constants/Toast";
+const { width } = Dimensions.get("window");
 
 export const Mathematics = () => {
   const [studentData, setStudentData] = useState<DocumentData>();
@@ -17,6 +28,8 @@ export const Mathematics = () => {
   const [userAnswer, setUserAnswer] = useState("");
   const [correctAnswer, setCorrectAnswer] = useState("");
   const [pointsUpdated, setPointsUpdated] = useState(false);
+  const [toast, setToast] = useState<ToastProps>({ message: "", color: "" });
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const fetchStudentData = async () => {
@@ -37,6 +50,20 @@ export const Mathematics = () => {
 
     fetchStudentData();
   }, [pointsUpdated]);
+
+  useEffect(() => {
+    if (toast.message !== "") {
+      toastTimeoutRef.current = setTimeout(() => {
+        setToast({ message: "", color: "" });
+      }, 2000);
+    }
+
+    return () => {
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
+    };
+  }, [toast.message]);
 
   const updatePoints = async (newPoints: number, newMathPoints: number) => {
     const db = getFirestore();
@@ -113,31 +140,38 @@ export const Mathematics = () => {
       const newPoints = studentData?.points + 1;
       const newMathPoints = studentData?.subjectPoints.mathPoints + 1;
       updatePoints(newPoints, newMathPoints);
+      setToast({ message: "Correct!", color: Colors.toastSuccess });
+      generateQuestion();
     } else {
       setCorrectAnswer("Incorrect. Try again.");
+      setToast({ message: "Try Again.", color: Colors.toastError });
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Math Quiz</Text>
-      <Text style={styles.gradeLevel}>
-        Grade Level: {studentData?.gradeLevel}
-      </Text>
-      <Text style={styles.question}>
-        {operand1} {operator} {operand2} =
-      </Text>
-      <TextInput
-        value={userAnswer}
-        onChangeText={(text) => setUserAnswer(text)}
-        keyboardType="numeric"
-        placeholder="Your Answer"
-        style={styles.input}
-      />
-      <Button title="Check Answer" onPress={checkAnswer} />
-      <Text style={styles.result}>{correctAnswer}</Text>
-      <Button title="Next Question" onPress={generateQuestion} />
-    </View>
+    <>
+      <View style={styles.container}>
+        <Text style={styles.header}>Math Quiz</Text>
+        <Text style={styles.gradeLevel}>
+          Grade Level: {studentData?.gradeLevel}
+        </Text>
+        <Text style={styles.question}>
+          {operand1} {operator} {operand2} =
+        </Text>
+        <TextInput
+          value={userAnswer}
+          onChangeText={(text) => setUserAnswer(text)}
+          keyboardType="numeric"
+          placeholder="Your Answer"
+          style={styles.input}
+        />
+        <TouchableOpacity style={styles.button} onPress={checkAnswer}>
+          <Text style={styles.buttonText}>Check Answer</Text>
+        </TouchableOpacity>
+        <Text style={styles.result}>{correctAnswer}</Text>
+      </View>
+      <CustomToast message={toast.message} color={toast.color} />
+    </>
   );
 };
 
@@ -146,30 +180,56 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
   },
   header: {
-    fontSize: 24,
-    marginBottom: 10,
+    fontSize: 50, // Increased font size
+    marginBottom: 20, // Increased margin for better spacing
+    color: Colors.secondary,
   },
   gradeLevel: {
-    fontSize: 20,
-    marginBottom: 10,
+    fontSize: 35, // Increased font size
+    marginBottom: 20, // Increased margin for better spacing
+    color: Colors.secondary,
   },
   question: {
-    fontSize: 18,
-    marginBottom: 10,
+    fontSize: 50, // Increased font size
+    marginBottom: 20, // Increased margin for better spacing
+    color: Colors.secondary,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#000",
-    width: 200,
-    marginBottom: 10,
-    paddingHorizontal: 10,
+    borderColor: Colors.secondary,
+    width: width * 0.8, // Adjusted width to take up most of the screen
+    height: 60, // Increased height for better visibility
+    marginBottom: 20,
+    paddingHorizontal: 20, // Increased padding for better input experience
+    backgroundColor: Colors.secondary,
+    color: Colors.primary,
+    fontSize: 24, // Increased font size
+    borderRadius: 20, // Rounded corners
+  },
+  buttonContainer: {
+    marginBottom: 20, // Increased margin for better spacing
+  },
+  button: {
+    marginBottom: 200,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    backgroundColor: Colors.primary,
+    borderRadius: 15,
+    width: width * 0.8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: Colors.secondary,
+    fontSize: 35, // Increased font size
+    fontWeight: "bold",
   },
   result: {
-    marginTop: 10,
-    fontSize: 18,
+    fontSize: 24, // Increased font size
     fontWeight: "bold",
+    color: Colors.primary,
   },
 });

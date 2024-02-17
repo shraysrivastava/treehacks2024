@@ -4,24 +4,55 @@ import Subject from "./Subjects/Subject";
 import { SubjectProps } from "./Subjects/Subject";
 import { Colors } from "../../../constants/Colors";
 import { useNavigation } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+import { auth } from "../../../firebase/firebase";
+import {
+  DocumentData,
+  doc,
+  getDoc,
+  getFirestore,
+  updateDoc,
+} from "firebase/firestore";
 
 export const StudentHome: React.FC = () => {
+  
+  const [studentData, setStudentData] = useState<DocumentData>();
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      const db = getFirestore();
+      const user = auth.currentUser; 
+
+      if (user) {
+        const docRef = doc(db, "users", user.uid); // Adjust "users" to your collection name
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setStudentData(docSnap.data());
+        } else {
+          console.log("No such document!");
+        }
+      }
+    };
+
+    fetchStudentData();
+  }, []);
+  
   // hardcoded for now
   const navigation = useNavigation();
   const subjects: SubjectProps[] = [
     {
       subjectName: "Mathematics",
-      gradeLevel: 2,
+      gradeLevel: studentData?.gradeLevel,
       subjectColor: Colors.blue,
     },
     {
       subjectName: "Science",
-      gradeLevel: 4,
+      gradeLevel: studentData?.gradeLevel,
       subjectColor: Colors.green,
     },
     {
       subjectName: "History",
-      gradeLevel: 1,
+      gradeLevel: studentData?.gradeLevel,
       subjectColor: Colors.red,
     },
   ];
@@ -33,7 +64,7 @@ export const StudentHome: React.FC = () => {
         <Subject
           key={index}
           subjectName={subject.subjectName}
-          gradeLevel={subject.gradeLevel}
+          gradeLevel={studentData?.gradeLevel}
           subjectColor={subject.subjectColor}
           navigation={navigation}
         />

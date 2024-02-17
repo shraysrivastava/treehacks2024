@@ -1,9 +1,9 @@
 export const Colors = {
-  background: "#030003",
-  primary: "#007aff",
-  secondary: "white",
-  accent1: "#00ff62",
-  accent2: "#ff003a",
+  background: "#030003", // black
+  primary: "#007aff", // blueish
+  secondary: "white", // white
+  accent1: "#00ff62", // greenish
+  accent2: "#ff003a", //redish
   blue: "blue",
   red: "red",
   green: "green",
