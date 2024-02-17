@@ -124,6 +124,13 @@ export const TeacherHome: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "lightblue",
   },
+  text: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "black",
+ },
 });
