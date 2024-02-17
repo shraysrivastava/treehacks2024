@@ -49,7 +49,7 @@ export const StudentNav = () => {
             })}
           />
           <Tab.Screen
-            name="MyPrize"
+            name="Wallet"
             component={RewardStoreStack}
             options={() => ({
                 tabBarIcon: ({ color, size }) => (
