@@ -57,10 +57,12 @@ export const TeacherHome: React.FC = () => {
       const updatedClasses = { ...userData.classes, [className]: [] };
       await updateDoc(userDocRef, { classes: updatedClasses });
       setToast({ message: "Class created successfully", color: "green" });
+      fetchTeacherData();
     } catch (error) {
       setToast({ message: "Error adding class", color: "red" });
       console.error("Error adding class: ", error);
     }
+    setCreateClassPopup(false);
   };
 
   return (
