@@ -10,7 +10,7 @@ export const StudentHome: React.FC = () => {
   const navigation = useNavigation();
   const subjects: SubjectProps[] = [
     {
-      subjectName: "Math",
+      subjectName: "Mathematics",
       gradeLevel: 2,
       subjectColor: Colors.blue,
     },
