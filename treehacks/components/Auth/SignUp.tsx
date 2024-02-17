@@ -132,7 +132,7 @@ export const SignUp = (props: SignUpProps) => {
         <Text style={styles.ButtonText}>Sign Up</Text>
       </TouchableOpacity>
       <View style={styles.container}>
-        <Text> Have an account? </Text>
+        <Text style={{color: Colors.textPrimary}}> Have an account? </Text>
         <Text
           style={styles.changeText}
           onPress={(event) => {
@@ -178,11 +178,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 27,
     fontWeight: "bold",
-    color: "black",
+    color: Colors.textPrimary,
     marginBottom: 10,
   },
   changeText: {
-    color: "blue",
+    color: Colors.accent1,
     // marginLeft: 70,
   },
   TextInput: {
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     padding: 10,
     alignItems: "center",
-    backgroundColor: "purple",
+    backgroundColor: Colors.primary,
     borderRadius: 10,
   },
   ButtonText: {

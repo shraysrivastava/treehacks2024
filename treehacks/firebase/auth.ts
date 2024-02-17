@@ -4,7 +4,7 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
-import { auth } from "./firebase";
+import { auth, db } from "./firebase";
 import { FirebaseError } from "firebase/app";
 import { getFirestore, setDoc, doc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -35,24 +35,24 @@ export const signUpUser = ({
         displayName: name,
       }).catch((error: FirebaseError) => authError(error, setError));
 
-      //sets new user document in firestore
-      const db = getFirestore();
+      
       if (accountType === "Teacher") {
         setDoc(doc(db, "users", userCredential.user.uid), {
           name: name,
           email: email,
           username: username,
           accountType: accountType,
-          students: [],
+          classes: [],
           school: "",
         }).catch((error: FirebaseError) => authError(error, setError));
       } else if (accountType === "Student") {
         setDoc(doc(db, "users", userCredential.user.uid), {
+          id: userCredential.user.uid,
           name: name,
           email: email,
           username: username,
           accountType: accountType,
-          class: "",
+          classes: [],
           points: 0,
           subjectPoints: {
             mathPoints: 0,

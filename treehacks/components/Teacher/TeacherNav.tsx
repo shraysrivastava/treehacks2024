@@ -25,7 +25,7 @@ export const TeacherNav = () => {
             borderTopColor: Colors.secondary,
             borderTopWidth: 2,
           },
-          tabBarActiveTintColor: Colors.primary,
+          tabBarActiveTintColor: Colors.accent1,
           tabBarInactiveTintColor: Colors.secondary,
           tabBarHideOnKeyboard: true,
         }}
