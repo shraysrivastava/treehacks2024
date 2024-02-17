@@ -3,7 +3,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import { StudentHome } from "./Home/StudentHome";
 import { Colors } from "../../constants/Colors";
 import { MaterialIcons, Entypo } from "@expo/vector-icons";
-
 import React from "react";
 import { StudentHomeStack } from "./Home/StudentHomeStack";
 import { ProfileHomeStack } from "./Profile/ProfileHomeStack";
