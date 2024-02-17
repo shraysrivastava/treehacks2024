@@ -40,7 +40,7 @@ export const SignIn = (props: SignInProps) => {
           </Text>
       </TouchableOpacity>
       <View style={styles.container}>
-        <Text>Don't have an account? </Text>
+        <Text style={{color: Colors.textPrimary}}>Don't have an account? </Text>
         <Text
             style={styles.changeText} 
             onPress={(event) => {props.setHasAccount(false);}}>
@@ -67,18 +67,18 @@ const styles = StyleSheet.create({
   signInText: {
     fontSize: 27,
     fontWeight: 'bold',
-    color: 'black',
+    color: Colors.textPrimary,
     marginBottom: 10,
   },
   changeText: {
-    color: "blue",
+    color: Colors.accent1,
   },
   TextInput: {
     width: 250,
     height: 40,
     borderWidth: 1,
     borderColor: 'lightgray',
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 5,
     margin: 5,
     borderRadius: 5,
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     margin: 5,
     padding: 10,
     alignItems: 'center',
-    backgroundColor: "purple",
+    backgroundColor: Colors.primary,
     borderRadius: 10,
   },
   ButtonText: {
