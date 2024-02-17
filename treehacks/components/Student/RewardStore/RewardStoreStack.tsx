@@ -18,7 +18,7 @@ export const RewardStoreStack = () => {
                         headerBackTitleVisible: false,
                         headerStyle: { backgroundColor: Colors.primary },
                     }}>
-            <Stack.Screen name="RewardStoreHome" component={RewardStoreHome} />
+            <Stack.Screen name="Redeem NFTs with your points!" component={RewardStoreHome} />
         </Stack.Navigator>
     );
 };
