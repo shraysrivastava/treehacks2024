@@ -1,24 +1,31 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { StudentHome } from './StudentHome';
-import { Colors } from '../../../constants/Colors';
+import { StudentHome } from "./StudentHome";
+import { Colors } from "../../../constants/Colors";
+import { Math } from "./Subjects/Math";
+import { Science } from "./Subjects/Science";
+import { History } from "./Subjects/History";
 
 const Stack = createStackNavigator();
 
 export const StudentHomeStack = () => {
   return (
     <Stack.Navigator
-        initialRouteName="StudentHome"
-        screenOptions={{
-            gestureEnabled: true,
-            gestureDirection: "horizontal",
-            headerShown: true,
-            headerTintColor: "#fff",
-            headerBackTitleVisible: false,
-            headerStyle: { backgroundColor: Colors.secondary },
-          }}>
+      initialRouteName="StudentHome"
+      screenOptions={{
+        gestureEnabled: true,
+        gestureDirection: "horizontal",
+        headerShown: true,
+        headerTintColor: "#fff",
+        headerBackTitleVisible: false,
+        headerStyle: { backgroundColor: Colors.secondary },
+      }}
+    >
       <Stack.Screen name="StudentHome" component={StudentHome} />
+      <Stack.Screen name="Math" component={Math} />
+      <Stack.Screen name="Science" component={Science} />
+      <Stack.Screen name="History" component={History} />
     </Stack.Navigator>
   );
 };
@@ -26,12 +33,11 @@ export const StudentHomeStack = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   text: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
-
