@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   ScrollView,
   RefreshControl,
+  Modal,
 } from 'react-native';
 import { togetherClient, TogetherImageModel } from 'together-ai-sdk';
 import { auth } from '../../../firebase/firebase';
@@ -36,6 +37,8 @@ export const RewardStoreHome = () => {
   const [toast, setToast] = useState<ToastProps>({ message: '', color: '' });
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [studentData, setStudentData] = useState<DocumentData>();
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [apiMessage, setApiMessage] = useState<string>('');
 
   useEffect(() => {
     setLoading(true);
@@ -144,6 +147,56 @@ export const RewardStoreHome = () => {
     fetchStudentData().finally(() => setRefreshing(false));
   }, []);
 
+const toggleModal = async () => {
+    setModalVisible(!modalVisible);
+    if (!modalVisible) {
+        try {
+        const hint = await getHint();
+        setApiMessage(hint);
+        } catch (error) {
+        console.error('Error getting hint:', error);
+        }
+    }
+};
+
+const url: string = 'https://api.together.xyz/v1/chat/completions';
+const apiKey: string = '77712fb6e31d5284a3c4015b53a49f6c4a9d093e29232cef4ff609c5c935a7d6';
+const getHint = async () => {
+  const headers: HeadersInit = new Headers({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${apiKey}`
+  });
+  const data: { model: string, max_tokens: number, messages: { role: string, content: string }[] } = {
+    model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+    max_tokens: 1024,
+    messages: [
+      {
+        role: 'system',
+        content: 'You are an AI assistant'
+      },
+      {
+        role: 'user',
+        content: `Give a hint as to what a NFT marketplace is designed to incentivize learning on an educational app. 
+        Students can earn points by answering questions and purchasing cool NFT redeemables. Explain as if you are talking to a 
+        student of ${studentData?.gradeLevel} grade level.`
+      }
+    ]
+  };
+  const options = {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(data)
+  };
+
+  try {
+    const response = await fetch(url, options);
+    const result = await response.json();
+    return result.choices[0].message.content;
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+
   return (
     <View style={styles.container}>
       {loading ? (
@@ -153,46 +206,56 @@ export const RewardStoreHome = () => {
         </View>
       ) : (
         <>
-          <View style={styles.scoreContainer}>
+        <View style={styles.scoreContainer}>
             <View style={styles.scoreBox}>
-              <MaterialIcons name="star" size={32} color={Colors.primary} />
-              <Text style={styles.scoreText}>{studentData?.points ? studentData.points : 0}</Text>
+                <MaterialIcons name="star" size={32} color={Colors.primary} />
+                <Text style={styles.scoreText}>{studentData?.points ? studentData.points : 0}</Text>
             </View>
-            
-
-          </View>
-          {apiResponses.length > 0 ? (
-            <>
-              <ScrollView
-                contentContainerStyle={styles.scrollViewContainer}
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[Colors.secondary]} tintColor={Colors.secondary} progressBackgroundColor="#ffffff" />}
-              >
-                <View style={styles.imagesContainer}>
-                  {apiResponses.map((response, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      style={[styles.imageContainer, selectedImage === response.image && styles.selectedImageContainer]}
-                      onPress={() => setSelectedImage(response.image)}
-                    >
-                      {selectedImage === response.image && <View style={styles.checkIcon}><Text>✓</Text></View>}
-                      <Image style={styles.image} source={{ uri: 'data:image/png;base64,' + response.image }} />
-                      <View style={styles.priceContainer}><Text style={styles.priceText}>{response.price} points</Text></View>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </ScrollView>
-              {selectedImage && (
-                <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-                  <Text style={styles.nextButtonText}>Redeem!</Text>
+            <TouchableOpacity onPress={toggleModal}>
+                    <MaterialIcons name="help-outline" size={32} color={Colors.primary} />
+            </TouchableOpacity>
+        </View>
+          <ScrollView
+            contentContainerStyle={styles.scrollViewContainer}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[Colors.secondary]} tintColor={Colors.secondary} progressBackgroundColor="#ffffff" />}
+          >
+            <View style={styles.imagesContainer}>
+              {apiResponses.map((response, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[styles.imageContainer, selectedImage === response.image && styles.selectedImageContainer]}
+                  onPress={() => setSelectedImage(response.image)}
+                >
+                  {selectedImage === response.image && <View style={styles.checkIcon}><Text>✓</Text></View>}
+                  <Image style={styles.image} source={{ uri: 'data:image/png;base64,' + response.image }} />
+                  <View style={styles.priceContainer}><Text style={styles.priceText}>{response.price} points</Text></View>
                 </TouchableOpacity>
-              )}
-            </>
-          ) : (
-            <Text style={styles.text}>No images available</Text>
+              ))}
+            </View>
+          </ScrollView>
+          {selectedImage && (
+            <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+              <Text style={styles.nextButtonText}>Redeem!</Text>
+            </TouchableOpacity>
           )}
         </>
       )}
       <CustomToast message={toast.message} color={toast.color} />
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={toggleModal}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text>{apiMessage}</Text>
+            <TouchableOpacity onPress={toggleModal}>
+              <Text>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -304,5 +367,26 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginHorizontal: 20,
     marginBottom: 20,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
