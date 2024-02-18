@@ -183,6 +183,8 @@ export const StudentHome: React.FC = () => {
           <Text style={styles.headerText}>
             <Text style={styles.Text}>🌿Freshen</Text> your brain! 🚀
           </Text>
+           <View style={{marginBottom: 10}}/>
+            
 
           {/* <Button title="Sign Out" onPress={() => signOutUser(setError)} /> */}
           {subjects.map((subject, index) => (
@@ -205,6 +207,7 @@ export const StudentHome: React.FC = () => {
               icon={subject.icon}
             />
           ))}
+          
         </>
       </ScrollView>
     </SafeAreaView>
