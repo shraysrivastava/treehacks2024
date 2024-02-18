@@ -54,8 +54,8 @@ export const StudentHome: React.FC = () => {
       subjectName: "Physics",
       gradeLevel: studentData?.gradeLevel || "1",
       subjectColor: Colors.secondary,
-      icon: "book"
-    }
+      icon: "book",
+    },
   ];
 
   const fetchStudentData = async () => {
@@ -75,7 +75,7 @@ export const StudentHome: React.FC = () => {
   };
   const fetchCourses = async (classes: string[]) => {
     // Ensure there are classes to process
-  
+
     if (!classes || classes.length === 0) {
       console.log("No classes found for the student.");
       return;
@@ -84,10 +84,10 @@ export const StudentHome: React.FC = () => {
     const coursesRef = collection(db, "courses");
 
     // Process each class UID to fetch course details
-  
+
     for (const classUID of classes) {
       try {
-        const docRef = doc(coursesRef, classUID); 
+        const docRef = doc(coursesRef, classUID);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
@@ -101,14 +101,16 @@ export const StudentHome: React.FC = () => {
               icon: "book",
             },
           ]);
-          setCourses([{
-            subjectName: docSnap.data().courseData.courseName,
-            gradeLevel: "Teacher Assigned Work",
-            subjectColor: determineSubjectColor(docSnap.data().courseData.courseName),
-            icon: "book",
-          }]);
-          
-          
+          setCourses([
+            {
+              subjectName: docSnap.data().courseData.courseName,
+              gradeLevel: "Teacher Assigned Work",
+              subjectColor: determineSubjectColor(
+                docSnap.data().courseData.courseName
+              ),
+              icon: "book",
+            },
+          ]);
         } else {
           console.log(`No course found for UID: ${classUID}`);
         }
@@ -120,7 +122,7 @@ export const StudentHome: React.FC = () => {
   };
 
   // Example function to determine subject color dynamically
-  
+
   const determineSubjectColor = (subjectName: string) => {
     switch (subjectName?.toLowerCase()) {
       case "mathematics":
@@ -159,7 +161,6 @@ export const StudentHome: React.FC = () => {
       .finally(() => setRefreshing(false));
   }, [fetchStudentData]);
 
-  
   const [error, setError] = useState("");
 
   return (
@@ -177,18 +178,23 @@ export const StudentHome: React.FC = () => {
         }
       >
         <>
-        <Text style={styles.headerText}>Welcome{studentData && (", "+ studentData?.name)}!</Text>
-        {/* <Button title="Sign Out" onPress={() => signOutUser(setError)} /> */}
-        {subjects.map((subject, index) => (
-          <Subject
-            key={index}
-            subjectName={subject.subjectName}
-            gradeLevel={determineDisplayName(subject.gradeLevel)}
-            subjectColor={subject.subjectColor}
-            navigation={navigation}
-            icon={subject.icon}
-          />
-        ))}
+          <Text style={styles.headerText}>Welcome {studentData?.name}</Text>
+
+          <Text style={styles.headerText}>
+            <Text style={styles.Text}>🌿Freshen</Text> your brain! 🚀
+          </Text>
+
+          {/* <Button title="Sign Out" onPress={() => signOutUser(setError)} /> */}
+          {subjects.map((subject, index) => (
+            <Subject
+              key={index}
+              subjectName={subject.subjectName}
+              gradeLevel={determineDisplayName(subject.gradeLevel)}
+              subjectColor={subject.subjectColor}
+              navigation={navigation}
+              icon={subject.icon}
+            />
+          ))}
           {courses.map((subject: DocumentData, index: number) => (
             <Subject
               key={index}
@@ -219,11 +225,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   headerText: {
-    fontSize: 28,
-    marginBottom: 10,
+    fontSize: 24,
     fontWeight: "bold",
-    color: Colors.textPrimary,
     textAlign: "center",
+    marginBottom: 10,
+  },
+  Text: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
+    color: Colors.accent1,
   },
 });
 
