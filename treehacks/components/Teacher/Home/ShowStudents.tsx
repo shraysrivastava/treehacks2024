@@ -86,8 +86,8 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
 
   useEffect(() => {
     fetchStudentData();
-  //  / fetchTeacherData();
-  }, [fetchStudentData,]);
+    //  / fetchTeacherData();
+  }, [fetchStudentData]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -172,8 +172,10 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
         const studentDocRef = querySnapshot.docs[0].ref; // Assuming email is unique, there should only be one document
         const courseName = `${userData.name}=${className}`; // Format: teacherName=courseName
 
+        // Add the new course to the student's classes array
         await updateDoc(studentDocRef, {
           classes: arrayUnion(courseName),
+          [`${courseName}Points`]: 0, // Add a new field {courseName}points and initialize it with 0
         });
       } else {
         console.log("Student not found");
@@ -197,7 +199,7 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
   console.log("SD: " + studentData.length);
 
   const navigation = useNavigation<TeacherHomeNavigationProps>();
-  
+
   const coursePath = teacherData?.name + "=" + className;
   return (
     <View style={styles.container}>
