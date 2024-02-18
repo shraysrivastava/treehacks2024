@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity, Text, StyleSheet, SafeAreaView, Button, Image, ActivityIndicator, ScrollView } from "react-native";
 import { togetherClient, TogetherImageModel } from 'together-ai-sdk';
@@ -22,25 +21,12 @@ export const RewardStoreHome = () => {
     const makeApiCall = async () => {
         try {
             const client = togetherClient({ apiKey: togetherAPIKey });
-=======
-import React, { useState } from "react";
-import { View, Text, StyleSheet, SafeAreaView, Button, Image } from "react-native";
-import { togetherClient, TogetherImageModel } from 'together-ai-sdk'
-
-export const RewardStoreHome = () => {
-    const [apiResponse, setApiResponse] = useState<string | null>(null);
-
-    const makeApiCall = async () => {
-        try {
-            const client = togetherClient({ apiKey: '77712fb6e31d5284a3c4015b53a49f6c4a9d093e29232cef4ff609c5c935a7d6' })
->>>>>>> b7b8011 (Cat generator)
             console.log('Making API call');
             const result = await client.image({
                 model: TogetherImageModel.Stable_Diffusion_XL_1_0,
                 prompt: 'A picture of a dog with a hat on',
                 width: 1024,
                 height: 1024,
-<<<<<<< HEAD
                 n: 2
             });
             const newResponses = result.output.choices.map(choice => choice.imageBase64);
@@ -161,27 +147,6 @@ export const RewardStoreHome = () => {
                     )}
                 </>
             )}
-=======
-                n: 1
-            })
-            console.log(result.output.choices[0].imageBase64);
-            setApiResponse(result.output.choices[0].imageBase64);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    return (
-        <SafeAreaView style={styles.container}>
-            {apiResponse ? (
-               /*  <Image source={{ uri: apiResponse }} style={styles.image} /> */
-               <Image style={styles.image} source={{uri: "data:image/png;base64,"+apiResponse}} />  
-
-            ) : (
-                <Text style={styles.text}>No image available</Text>
-            )}
-            <Button title="Make API Call" onPress={makeApiCall} />
->>>>>>> b7b8011 (Cat generator)
         </SafeAreaView>
     );
 };
@@ -197,7 +162,6 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: "black",
     },
-<<<<<<< HEAD
     scrollViewContainer: {
         flexGrow: 1,
         justifyContent: "center",
@@ -218,13 +182,10 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: "blue",
     },
-=======
->>>>>>> b7b8011 (Cat generator)
     image: {
         width: 200,
         height: 200,
     },
-<<<<<<< HEAD
     button: {
         backgroundColor: 'gold',
         padding: 12,
@@ -264,6 +225,3 @@ const styles = StyleSheet.create({
 });
 
 export default RewardStoreHome;
-=======
-});
->>>>>>> b7b8011 (Cat generator)

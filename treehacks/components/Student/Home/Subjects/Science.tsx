@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from "react";
 import {
   View,
@@ -282,16 +281,3 @@ const styles = StyleSheet.create({
     marginRight: 5,
   }
 });
-=======
-import { View, Text } from 'react-native'
-import React from 'react'
-
-export const Science = () => {
-  return (
-    <View>
-      <Text>Science</Text>
-    </View>
-  )
-}
-
->>>>>>> b7b8011 (Cat generator)
