@@ -26,12 +26,10 @@ export const History = () => {
   const [questionData, setQuestionData] = useState<DocumentData>();
   const [studentData, setStudentData] = useState<DocumentData>();
   const [pointsUpdated, setPointsUpdated] = useState(false);
-  const [question, setQuestion] = useState("");
-  const [correctAnswer, setCorrectAnswer] = useState("");
-  const [incorrectAnswers, setIncorrectAnswers] = useState<string[]>([]);
   const [toast, setToast] = useState<ToastProps>({ message: "", color: "" });
+  const [showFeedback, setShowFeedback] = useState(false); // State for showing/hiding feedback
+  const [hint, setHint] = useState<string | null>(null); // State to store the hint
   const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [topics, setTopics] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchStudentData = async () => {
@@ -55,7 +53,6 @@ export const History = () => {
 
   useEffect(() => {
     if (studentData) {
-      fetchGeneratedQuestion();
       fetchRandomQuestion();
     }
   }, [studentData]);
@@ -74,9 +71,18 @@ export const History = () => {
     };
   }, [toast.message]);
 
+  useEffect(() => {
+    // Fetch hint when showFeedback is true
+    if (showFeedback) {
+      getHint().then((hint) => {
+        setHint(hint);
+      });
+    }
+  }, [showFeedback]);
+
   const url: string = 'https://api.together.xyz/v1/chat/completions';
   const apiKey: string = '77712fb6e31d5284a3c4015b53a49f6c4a9d093e29232cef4ff609c5c935a7d6';
-  const fetchGeneratedQuestion = async () => {
+  const getHint = async () => {
     const headers: HeadersInit = new Headers({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`
@@ -92,8 +98,7 @@ export const History = () => {
         },
         {
           role: 'user',
-          content: `Create a new US history question for a student of ${studentData?.gradeLevel} grade level. The question should not be in ${topics} Give one correct answer, and three wrong answers.
-          make sure the first line of your response is the question. the first line is the correct answer. and the 6th line onwards are incorrect answers`
+          content: `Give a hint for this question ${questionData?.question} as if you are talking to a student of ${studentData?.gradeLevel} grade level.`
         }
       ]
     };
@@ -107,37 +112,14 @@ export const History = () => {
     try {
       const response = await fetch(url, options);
       const result = await response.json();
-      const generatedQuestion = result.choices[0].message.content;
-      // Split the string into lines
-      const lines = generatedQuestion.split('\n');
-
-      // Extract question
-      setQuestion(lines[0].replace('Question: ', ''))
-
-      setCorrectAnswer(lines[2].replace('Correct answer: ', ''))
-
-      setIncorrectAnswers(lines.slice(6).map((line: string) => line.replace(/^\d+\. /, '')))
-
-      setTopics(prevTopics => [...prevTopics, question])
-
+      return result.choices[0].message.content;
     } catch (error) {
       console.error('Error:', error);
     }
   };
 
-  const postGeneratedQuestion = async () => {
-    const db = getFirestore();
-    await addDoc(collection(db, `grade-${studentData?.gradeLevel}History`), {
-      question: question,
-      answer: correctAnswer,
-      wrongAnswer1: incorrectAnswers[0],
-      wrongAnswer2: incorrectAnswers[1],
-      wrongAnswer3: incorrectAnswers[2],
-    });
-  };
-
-  postGeneratedQuestion();
   const fetchRandomQuestion = async () => {
+    setShowFeedback(false); // Reset showFeedback state when fetching a new question
     const db = getFirestore();
     const collectionRef = collection(
       db,
@@ -148,7 +130,7 @@ export const History = () => {
     querySnapshot.forEach((doc) => {
       questions.push({ id: doc.id, ...doc.data() });
     });
-
+  
     const randomIndex = Math.floor(Math.random() * questions.length);
     const randomQuestion = questions[randomIndex];
     setQuestionData(randomQuestion);
@@ -162,16 +144,28 @@ export const History = () => {
     return array;
   };
 
-  const handleAnswerSelect = (selectedAnswer: string) => {
+  const handleAnswerSelect = async (selectedAnswer: string) => {
     if (selectedAnswer === questionData?.answer) {
-      setToast({ message: "Correct!", color: Colors.toastSuccess });
+      setToast({ message: "Correct!", color: Colors.toastSuccess})
       const newPoints = studentData?.points + 1;
-      const newHistoryPoints = studentData?.subjectPoints.historyPoints + 1;
-      updatePoints(newPoints, newHistoryPoints);
-      console.log(studentData);
+      const newSciencePoints = studentData?.subjectPoints.sciencePoints + 1;
+      updatePoints(newPoints, newSciencePoints);
     } else {
       setToast({ message: "Try Again.", color: Colors.toastError });
+      setShowFeedback(true); // Show feedback if the answer is wrong
+      // Fetch hint if needed
+      if (!hint) {
+        try {
+          const hintFromAPI = await getHint();
+          setHint(hintFromAPI);
+        } catch (error) {
+          console.error('Error fetching hint:', error);
+        }
+      }
+      return; // Skip fetching the next question
     }
+  
+    // Proceed to fetch the next question only if the answer is correct
     fetchRandomQuestion();
   };
 
@@ -220,9 +214,17 @@ export const History = () => {
               <Text style={styles.buttonText}>{answer}</Text>
             </TouchableOpacity>
           ))}
+          {showFeedback && (
+            <View style={styles.feedbackContainer}>
+              <Text style={styles.feedbackText}>Oops! That's not correct!</Text>
+              <Text style={styles.AItext}>
+                Here's an AI hint: {hint}
+              </Text>
+            </View>
+          )}
         </View>
       )}
-      <CustomToast message={toast.message} color={toast.color} />
+      <CustomToast message={toast.message} color={toast.color}/>
     </ScrollView>
   );
 };
@@ -258,4 +260,24 @@ const styles = StyleSheet.create({
     fontSize: 35,
     color: Colors.secondary,
   },
+  feedbackContainer: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: Colors.lightgray,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  feedbackText: {
+    fontSize: 20,
+    color: Colors.primary,
+    marginBottom: 10,
+  },
+  AItext: {
+    fontSize: 15,
+    color: Colors.primary,
+    marginBottom: 10,
+  },
+  icon: {
+    marginRight: 5,
+  }
 });
