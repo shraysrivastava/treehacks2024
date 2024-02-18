@@ -95,7 +95,7 @@ export const History = () => {
       messages: [
         {
           role: 'system',
-          content: 'You are an AI assistant'
+          content: 'You are an AI assistant who does not start with greetings, just gets to the point'
         },
         {
           role: 'user',

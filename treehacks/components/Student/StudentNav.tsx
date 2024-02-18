@@ -50,16 +50,7 @@ export const StudentNav = () => {
               ),
             })}
           />
-          
-          <Tab.Screen
-            name="Wallet"
-            component={RewardStoreStack}
-            options={() => ({
-                tabBarIcon: ({ color, size }) => (
-                    <MaterialIcons name="savings" color={color} size={size} />
-              ),
-            })}
-          />        
+        
           <Tab.Screen
             name="Leaderboard"
             component={LeaderBoard}
