@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from "react";
 import {
   View,
@@ -191,3 +192,16 @@ const styles = StyleSheet.create({
     color: Colors.secondary,
   },
 });
+=======
+import { View, Text } from 'react-native'
+import React from 'react'
+
+export const Science = () => {
+  return (
+    <View>
+      <Text>Science</Text>
+    </View>
+  )
+}
+
+>>>>>>> d89bfa2a470becae3f665b8a89a0da8caae31949
