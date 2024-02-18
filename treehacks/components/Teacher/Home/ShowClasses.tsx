@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   classContainer: {
-    backgroundColor: Colors.primary, // Consider using a lighter shade for better readability
+    backgroundColor: Colors.primary, 
     borderRadius: 10,
     padding: 20,
     flexDirection: 'row',

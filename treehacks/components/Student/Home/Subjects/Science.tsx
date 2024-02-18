@@ -117,8 +117,7 @@ export const Science = () => {
       updatePoints(newPoints, newLeaderBoardPoints, newSciencePoints);
     } else {
       setToast({ message: "Try Again.", color: Colors.toastError });
-      setShowFeedback(true); // Show feedback if the answer is wrong
-      // Fetch hint if needed
+      setShowFeedback(true); 
       if (!hint) {
         try {
           const hintFromAPI = await getHint();
@@ -127,10 +126,9 @@ export const Science = () => {
           console.error('Error fetching hint:', error);
         }
       }
-      return; // Skip fetching the next question
+      return; 
     }
   
-    // Proceed to fetch the next question only if the answer is correct
     fetchRandomQuestion();
   };
   

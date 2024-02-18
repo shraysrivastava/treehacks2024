@@ -84,9 +84,8 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   logo: {
-    width: 200, // Adjust size as needed
-    height: 200, // Adjust size as needed
-    // resizeMode: 'contain', // Ensure the logo scales correctly
+    width: 200, 
+    height: 200, 
   },
   headerText: {
     fontSize: 28,

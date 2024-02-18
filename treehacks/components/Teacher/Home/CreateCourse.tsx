@@ -123,7 +123,6 @@ export const CreateCourse: React.FC<CreateClassProps> = ({ route }) => {
           />
         </View>
 
-        {/* Answer and Wrong Answers */}
         <View style={styles.questionContainer}>
           <Text style={styles.label}>Answer:</Text>
           <TextInput
@@ -157,7 +156,6 @@ export const CreateCourse: React.FC<CreateClassProps> = ({ route }) => {
           />
         </View>
 
-        {/* Buttons */}
         <TouchableOpacity style={styles.button} onPress={handleAddQuestion}>
           <Text style={styles.buttonText}>Add Question</Text>
         </TouchableOpacity>
@@ -165,7 +163,6 @@ export const CreateCourse: React.FC<CreateClassProps> = ({ route }) => {
           <Text style={styles.buttonText}>Create Course</Text>
         </TouchableOpacity>
 
-        {/* Toast Message */}
         
       </ScrollView>
       <CustomToast message={toast.message} color={toast.color} />

@@ -47,12 +47,12 @@ export const StudentProgress: React.FC<StudentProgressProps> = ({ student, stude
 
 const styles = StyleSheet.create({
   studentContainer: {
-    backgroundColor: "white", // White background
+    backgroundColor: "white", 
     padding: 15,
     borderRadius: 8,
     marginVertical: 5,
     borderWidth: 1,
-    borderColor: Colors.lightgray, // Light grey border
+    borderColor: Colors.lightgray,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

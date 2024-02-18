@@ -120,7 +120,7 @@ export const History = () => {
   };
 
   const fetchRandomQuestion = async () => {
-    setShowFeedback(false); // Reset showFeedback state when fetching a new question
+    setShowFeedback(false); 
     const db = getFirestore();
     const collectionRef = collection(
       db,
@@ -154,8 +154,7 @@ export const History = () => {
       updatePoints(newPoints, newleaderBoardPoints, newSciencePoints);
     } else {
       setToast({ message: "Try Again.", color: Colors.toastError });
-      setShowFeedback(true); // Show feedback if the answer is wrong
-      // Fetch hint if needed
+      setShowFeedback(true);
       if (!hint) {
         try {
           const hintFromAPI = await getHint();
@@ -164,10 +163,10 @@ export const History = () => {
           console.error('Error fetching hint:', error);
         }
       }
-      return; // Skip fetching the next question
+      return; 
     }
   
-    // Proceed to fetch the next question only if the answer is correct
+
     fetchRandomQuestion();
   };
 

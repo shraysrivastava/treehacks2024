@@ -14,12 +14,12 @@ export const QuestionPopup: React.FC<RemovePopupProps> = ({ isVisible, onCancel,
       visible={isVisible}
       animationType="fade"
       transparent={true}
-      onRequestClose={onCancel} // For hardware back button on Android
+      onRequestClose={onCancel} 
     >
       <TouchableOpacity
         style={styles.modalOverlay}
         activeOpacity={1}
-        onPressOut={onCancel} // Closes the modal when the overlay is pressed
+        onPressOut={onCancel}
       >
         <View style={styles.popupContainer} onStartShouldSetResponder={() => true}>
           <Text style={styles.popupText}>

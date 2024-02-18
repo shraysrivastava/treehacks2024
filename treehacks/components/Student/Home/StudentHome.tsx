@@ -74,7 +74,6 @@ export const StudentHome: React.FC = () => {
     }
   };
   const fetchCourses = async (classes: string[]) => {
-    // Ensure there are classes to process
 
     if (!classes || classes.length === 0) {
       console.log("No classes found for the student.");
@@ -82,8 +81,6 @@ export const StudentHome: React.FC = () => {
     }
 
     const coursesRef = collection(db, "courses");
-
-    // Process each class UID to fetch course details
 
     for (const classUID of classes) {
       try {
