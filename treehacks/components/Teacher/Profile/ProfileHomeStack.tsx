@@ -9,7 +9,7 @@ const Stack = createStackNavigator();
 export const ProfileHomeStack = () => {
   return (
     <Stack.Navigator
-        initialRouteName="ProfileHome"
+        initialRouteName="Profile "
         screenOptions={{
             gestureEnabled: true,
             gestureDirection: "horizontal",
@@ -18,7 +18,7 @@ export const ProfileHomeStack = () => {
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.primary },
           }}>
-      <Stack.Screen name="ProfileHome" component={ProfileHome} />
+      <Stack.Screen name="Profile " component={ProfileHome} />
     </Stack.Navigator>
   );
 };

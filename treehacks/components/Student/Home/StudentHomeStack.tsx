@@ -23,7 +23,7 @@ export const StudentHomeStack = () => {
         headerTitleStyle: { fontWeight: "bold", color: Colors.background}
       }}
     >
-      <Stack.Screen name="Dashboard" component={StudentHome} />
+      <Stack.Screen name="Dashboard " component={StudentHome} />
       <Stack.Screen name="Mathematics" component={Mathematics} />
       <Stack.Screen name="Science" component={Science} />
       <Stack.Screen name="History" component={History} />

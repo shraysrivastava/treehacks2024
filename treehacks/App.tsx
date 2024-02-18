@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Button, StyleSheet, Text, View } from 'react-native';
 import { StudentNav } from './components/Student/StudentNav';
 import { useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from "firebase/auth";
@@ -16,6 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 } */
 //  if (!global.btoa) { global.btoa = encode; } if (!global.atob) { global.atob = decode; }
 import { decode } from 'base-64';
+import { signOutUser } from './firebase/auth';
 
 if(typeof atob === 'undefined') {
   global.atob = decode;
@@ -24,6 +25,7 @@ if(typeof atob === 'undefined') {
 export default function App() {
   const [user, setUser] = useState<User>();
   const [userData, setUserData] = useState<DocumentData>();
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     const checkUser = async () => {
@@ -59,6 +61,8 @@ export default function App() {
       return (
         <View style={styles.container}>
           <Text>Loading</Text>
+          <Button title="logout" onPress={() => signOutUser(setError)}></Button>
+
         </View>
       )
     } else if (userData.accountType == undefined) {

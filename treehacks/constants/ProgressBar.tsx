@@ -27,7 +27,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ count, capacity }) => 
         
       </View>
       <Text style={styles.countCapacityText}>
-        {count}/{capacity} questions
+        {count}/{capacity}
       </Text>
     </View>
   );
@@ -39,15 +39,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "50%",
     marginLeft: 5,
+    position: "relative",
+    left: -30,
     marginTop: 5,
   },
   progressBar: {
     width: "100%",
     height: 20,
     flexDirection: "row",
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.lightgray,
     borderRadius: 10,
     overflow: "hidden",
+    
   },
   filledProgress: {
     justifyContent: "center", // Center text vertically

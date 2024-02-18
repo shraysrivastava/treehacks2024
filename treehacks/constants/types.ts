@@ -5,6 +5,7 @@ export interface StudentData {
     gradeLevel: string;
     name: string;
     points: number;
+    leaderBoardPoints: number;
     subjectPoints: {
         [subject: string]: number;
     };

@@ -32,7 +32,7 @@ export const StudentNav = () => {
           }}
         >
           <Tab.Screen
-            name="Student"
+            name="Dashboard"
             component={StudentHomeStack}
             options={({}) => ({
                 tabBarIcon: ({ color, size }) => (

@@ -11,9 +11,9 @@ import { CreateCourse } from "./CreateCourse";
 
 // Define types for navigation parameters
 type TeacherHomeStackParamsList = {
-  Home: undefined;
+   "Home": undefined;
   "Manage Students": undefined;
-  CreateCourse: { coursePath: string };
+  "Create Course": { coursePath: string };
 };
 
 // Define props type for navigation
@@ -38,7 +38,7 @@ export const TeacherHomeStack: React.FC = () => {
 
       <Stack.Screen name="Home" component={TeacherHome} />
       <Stack.Screen name="Manage Students" component={ShowStudents} />
-      <Stack.Screen name="CreateCourse" component={CreateCourse} />
+      <Stack.Screen name="Create Course" component={CreateCourse} />
 
     </Stack.Navigator>
   );

@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   ScrollView,
   RefreshControl,
+  Button,
 } from "react-native";
 import Subject from "./Subjects/Subject";
 import { SubjectProps } from "./Subjects/Subject";
@@ -21,6 +22,7 @@ import {
   getFirestore,
 } from "firebase/firestore";
 import { StudentData } from "../../../constants/types";
+import { signOutUser } from "../../../firebase/auth";
 
 export const StudentHome: React.FC = () => {
   const [studentData, setStudentData] = useState<StudentData>();
@@ -152,6 +154,7 @@ export const StudentHome: React.FC = () => {
   }, [fetchStudentData]);
 
   
+  const [error, setError] = useState("");
 
   return (
     <SafeAreaView style={styles.container}>
@@ -169,6 +172,7 @@ export const StudentHome: React.FC = () => {
       >
         <>
         <Text style={styles.headerText}>Welcome, {studentData?.name}!</Text>
+        {/* <Button title="Sign Out" onPress={() => signOutUser(setError)} /> */}
         {subjects.map((subject, index) => (
           <Subject
             key={index}
@@ -204,11 +208,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 20,
   },
+  header: {
+    marginBottom: 30,
+    paddingHorizontal: 20,
+  },
   headerText: {
     fontSize: 28,
+    marginBottom: 10,
     fontWeight: "bold",
     color: Colors.textPrimary,
-    marginBottom: 30,
     textAlign: "center",
   },
 });

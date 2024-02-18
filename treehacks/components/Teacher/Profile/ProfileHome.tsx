@@ -5,6 +5,7 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
+  Image
 } from "react-native";
 import { signOutUser } from "../../../firebase/auth";
 import { auth } from "../../../firebase/firebase";
@@ -13,8 +14,8 @@ import {
   doc,
   getDoc,
   getFirestore,
-  updateDoc,
 } from "firebase/firestore";
+import { Colors } from "../../../constants/Colors";
 
 export const ProfileHome = () => {
   const [error, setError] = useState("");
@@ -42,7 +43,12 @@ export const ProfileHome = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.text}>Profile Home</Text>
+      <View style={{marginBottom: 10}}>
+      <Image 
+          source={require('../../../assets/logo.png')} 
+          style={styles.logo} 
+        />
+    </View>
       {studentData && (
         <View style={styles.userInfoContainer}>
           <View style={styles.userInfoItem}>
@@ -50,7 +56,7 @@ export const ProfileHome = () => {
             <Text style={styles.value}>{studentData.name}</Text>
           </View>
           <View style={styles.userInfoItem}>
-            <Text style={styles.label}>Email: </Text>
+            <Text style={styles.label}>Email:</Text>
             <Text style={styles.value}>{studentData.email}</Text>
           </View>
           <View style={styles.userInfoItem}>
@@ -72,19 +78,26 @@ export const ProfileHome = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f5f5f5", // Light grey background
+    justifyContent: "center",
+    backgroundColor: Colors.background,
+    paddingVertical: 20,
   },
-  text: {
-    fontSize: 24,
+  logo: {
+    width: 200, // Adjust size as needed
+    height: 200, // Adjust size as needed
+    // resizeMode: 'contain', // Ensure the logo scales correctly
+  },
+  headerText: {
+    fontSize: 28,
     fontWeight: "bold",
-    color: "#333", // Darker text color for better readability
-    marginBottom: 20, // Adds some space before the logout button
+    color: Colors.textPrimary,
+    marginBottom: 30,
   },
   userInfoContainer: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
+    width: "90%",
+    backgroundColor: Colors.lightgray,
+    borderRadius: 20,
     padding: 20,
     marginBottom: 20,
     shadowColor: "#000",
@@ -104,27 +117,30 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: "bold",
     fontSize: 16,
-    color: "#333",
+    color: Colors.textPrimary,
   },
   value: {
     fontSize: 16,
-    color: "#555",
+    color: Colors.primary,
   },
   logoutButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: "#ff4757", // A red color for the logout button
-    borderRadius: 20, // Rounded corners for the button
-    borderWidth: 1,
-    borderColor: "#ff6b81", // Slightly lighter red for the border
-    elevation: 2, // Adds a slight shadow for Android
-    shadowColor: "#000", // Shadow for iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    backgroundColor: Colors.accent2,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   logoutButtonText: {
-    color: "#fff", // White text color
+    color: Colors.textSecondary,
     fontSize: 16,
     fontWeight: "bold",
   },

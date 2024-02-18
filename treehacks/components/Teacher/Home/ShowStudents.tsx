@@ -180,7 +180,7 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
       </ScrollView>
       <TouchableOpacity
         style={styles.createCourseButton}
-        onPress={() => navigation.navigate('CreateCourse', { coursePath })}
+        onPress={() => navigation.navigate('Create Course', { coursePath })}
       >
         <Text style={styles.createCourseButtonText}>Create Course</Text>
       </TouchableOpacity>
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderRadius: 10,
     marginHorizontal: 15,
-    marginBottom: Platform.OS === 'ios' ? 20 : 15,
+    marginBottom: 15,
     alignItems: 'center',
   },
   createCourseButtonText: {

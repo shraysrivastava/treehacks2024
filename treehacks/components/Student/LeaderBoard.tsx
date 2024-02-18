@@ -22,11 +22,12 @@ export const LeaderBoard = () => {
     const q = query(
       collection(db, "users"),
       where("accountType", "==", "Student"),
-      orderBy("points", "desc")
+      orderBy("leaderBoardPoints", "desc")
     );
     const querySnapshot = await getDocs(q);
-    const studentsData = querySnapshot.docs.map((doc) => doc.data());
-    setStudents(studentsData as StudentData[]);
+    const studentsData = querySnapshot.docs.map((doc) => doc.data()); 
+    const sortedStudents = studentsData.sort((a, b) => b.leaderBoardPoints - a.leaderBoardPoints);
+    setStudents(sortedStudents as StudentData[]);
   };
   useEffect(() => {
     fetchStudents();
@@ -45,7 +46,7 @@ export const LeaderBoard = () => {
     );
   }
 
-  const pointsData = students.map((student) => student.points);
+  const pointsData = students.map((student) => student.leaderBoardPoints);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -66,7 +67,7 @@ export const LeaderBoard = () => {
           <Animated.View key={index} style={[styles.listItem]}>
             <Text style={styles.rank}>{index + 1}.</Text>
             <Text style={styles.name}>{student.name}</Text>
-            <Text style={styles.points}>{student.points} points</Text>
+            <Text style={styles.points}>{student.leaderBoardPoints} points</Text>
           </Animated.View>
         ))}
       </ScrollView>

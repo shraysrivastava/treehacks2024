@@ -112,8 +112,9 @@ export const Science = () => {
     if (selectedAnswer === questionData?.answer) {
       setToast({ message: "Correct!", color: Colors.toastSuccess})
       const newPoints = studentData?.points + 1;
+      const newLeaderBoardPoints = studentData?.leaderBoardPoints + 1;
       const newSciencePoints = studentData?.subjectPoints.sciencePoints + 1;
-      updatePoints(newPoints, newSciencePoints);
+      updatePoints(newPoints, newLeaderBoardPoints, newSciencePoints);
     } else {
       setToast({ message: "Try Again.", color: Colors.toastError });
       setShowFeedback(true); // Show feedback if the answer is wrong
@@ -134,7 +135,7 @@ export const Science = () => {
   };
   
 
-  const updatePoints = async (newPoints: number, newSciencePoints: number) => {
+  const updatePoints = async (newPoints: number, newLeaderBoardPoints: number, newSciencePoints: number) => {
     const db = getFirestore();
     const user = auth.currentUser;
 
@@ -149,6 +150,7 @@ export const Science = () => {
       try {
         await updateDoc(docRef, {
           points: newPoints,
+          newLeaderBoardPoints: newLeaderBoardPoints,
           subjectPoints: updatedSubjectPoints,
         });
         setPointsUpdated(true);
@@ -239,17 +241,28 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
+    paddingVertical: 20,
   },
   questionContainer: {
     width: width * 0.9,
     padding: 20,
     borderRadius: 20,
+    backgroundColor: Colors.lightgray,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   questionText: {
-    fontSize: 28,
+    fontSize: 24,
     marginBottom: 20,
     color: Colors.secondary,
+    textAlign: "center",
   },
   button: {
     marginBottom: 10,
@@ -260,29 +273,34 @@ const styles = StyleSheet.create({
     width: width * 0.8,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   buttonText: {
-    fontSize: 33,
-    color: Colors.secondary,
+    fontSize: 20,
+    color: Colors.textSecondary,
   },
   feedbackContainer: {
     marginTop: 20,
     padding: 10,
-    backgroundColor: Colors.lightgray,
+    backgroundColor: Colors.accent2,
     borderRadius: 10,
     alignItems: "center",
   },
   feedbackText: {
-    fontSize: 20,
-    color: Colors.primary,
+    fontSize: 18,
+    color: Colors.textSecondary,
     marginBottom: 10,
   },
   AItext: {
-    fontSize: 15,
-    color: Colors.primary,
+    fontSize: 16,
+    color: Colors.textSecondary,
     marginBottom: 10,
   },
-  icon: {
-    marginRight: 5,
-  }
 });

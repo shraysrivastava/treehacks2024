@@ -1,4 +1,4 @@
-import {
+  import {
   View,
   Text,
   TextInput,
@@ -68,7 +68,7 @@ export const Mathematics = () => {
     };
   }, [toast.message]);
 
-  const updatePoints = async (newPoints: number, newMathPoints: number) => {
+  const updatePoints = async (newPoints: number, newLeaderBoardPoints: number, newMathPoints: number) => {
     const db = getFirestore();
     const user = auth.currentUser;
 
@@ -83,6 +83,7 @@ export const Mathematics = () => {
       try {
         await updateDoc(docRef, {
           points: newPoints,
+          leaderBoardPoints: newLeaderBoardPoints,
           subjectPoints: updatedSubjectPoints,
         });
         setPointsUpdated(true); // Set pointsUpdated to true to trigger useEffect
@@ -141,8 +142,9 @@ export const Mathematics = () => {
     if (parseFloat(userAnswer) === ans) {
       setCorrectAnswer("Correct!");
       const newPoints = studentData?.points + 1;
+      const newLeaderBoardPoints = studentData?.leaderBoardPoints + 1;
       const newMathPoints = studentData?.subjectPoints.mathPoints + 1;
-      updatePoints(newPoints, newMathPoints);
+      updatePoints(newPoints, newLeaderBoardPoints, newMathPoints);
       setToast({ message: "Correct!", color: Colors.toastSuccess });
       generateQuestion();
     } else {
@@ -155,21 +157,24 @@ export const Mathematics = () => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <Text style={styles.header}>What is...</Text>
-        <Text style={styles.question}>
-          {operand1} {operator} {operand2} =
-        </Text>
-        <TextInput
-          value={userAnswer}
-          onChangeText={(text) => setUserAnswer(text)}
-          keyboardType="numeric"
-          placeholder="Your Answer"
-          style={styles.input}
-        />
+        <View style={styles.questionContainer}>
+          <Text style={styles.question}>
+            {operand1} {operator} {operand2} =
+          </Text>
+          <TextInput
+            value={userAnswer}
+            onChangeText={(text) => setUserAnswer(text)}
+            keyboardType="numeric"
+            placeholder="Your Answer"
+            style={styles.input}
+          />
+        </View>
         <TouchableOpacity style={styles.button} onPress={checkAnswer}>
           <Text style={styles.buttonText}>Check Answer</Text>
         </TouchableOpacity>
         <Text style={styles.result}>{correctAnswer}</Text>
         <Skip onPress={generateQuestion}></Skip>
+        <CustomToast message={toast.message} color={toast.color} />
       </View>
     </TouchableWithoutFeedback>
   );
@@ -180,50 +185,73 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Colors.lightBlue, // Updated background color
-    paddingHorizontal: 20, // Added horizontal padding
+    backgroundColor: Colors.background,
+    paddingHorizontal: 20,
   },
   header: {
-    fontSize: 36,
+    fontSize: 28,
     marginBottom: 20,
-    color: Colors.darkBlue, // Updated text color
-    fontWeight: "bold", // Added font weight
+    color: Colors.secondary,
+    fontWeight: "bold",
+  },
+  questionContainer: {
+    width: width * 0.9,
+    padding: 20,
+    borderRadius: 20,
+    backgroundColor: Colors.lightgray,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   question: {
-    fontSize: 48,
+    fontSize: 32,
     marginBottom: 20,
-    color: Colors.darkBlue, // Updated text color
-    fontWeight: "bold", // Added font weight
+    color: Colors.secondary,
   },
   input: {
     borderWidth: 2,
-    borderColor: Colors.darkBlue, // Updated border color
+    borderColor: Colors.primary,
     width: width * 0.8,
-    height: 60,
+    height: 50,
     marginBottom: 20,
     paddingHorizontal: 20,
-    backgroundColor: Colors.white, // Updated background color
-    color: Colors.darkBlue, // Updated text color
-    fontSize: 24,
-    borderRadius: 15, // Updated border radius
+    backgroundColor: Colors.background,
+    color: Colors.secondary,
+    fontSize: 22,
+    borderRadius: 15,
   },
   button: {
-    paddingVertical: 15,
+    paddingVertical: 12,
     paddingHorizontal: 20,
-    backgroundColor: Colors.orange, // Updated button color
+    backgroundColor: Colors.primary,
     borderRadius: 15,
     width: width * 0.8,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   buttonText: {
-    color: Colors.white, // Updated text color
-    fontSize: 24,
+    color: Colors.textSecondary,
+    fontSize: 22,
     fontWeight: "bold",
   },
   result: {
-    fontSize: 24,
-    color: Colors.darkBlue, // Updated text color
-    fontStyle: "italic", // Added italic style
+    fontSize: 22,
+    color: Colors.secondary,
+    fontStyle: "italic",
+    marginTop: 10,
   },
 });

@@ -57,6 +57,7 @@ export const signUpUser = ({
           accountType: accountType,
           classes: [],
           points: 0,
+          leaderBoardPoints: 0,
           subjectPoints: {
             mathPoints: 0,
             sciencePoints: 0,

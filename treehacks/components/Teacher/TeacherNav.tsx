@@ -31,11 +31,11 @@ export const TeacherNav = () => {
         }}
       >
         <Tab.Screen
-          name="Teacher"
+          name="Dashboard"
           component={TeacherHomeStack}
           options={({}) => ({
             tabBarIcon: ({ color, size }) => (
-              <MaterialIcons name="star" color={color} size={size} />
+              <MaterialIcons name="home" color={color} size={size} />
             ),
           })}
         />
@@ -44,7 +44,7 @@ export const TeacherNav = () => {
           component={ProfileHomeStack}
           options={() => ({
             tabBarIcon: ({ color, size }) => (
-              <MaterialIcons name="star" color={color} size={size} />
+              <MaterialIcons name="account-circle" color={color} size={size} />
             ),
           })}
         />
