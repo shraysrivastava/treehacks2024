@@ -9,7 +9,7 @@ import { FirebaseError } from "firebase/app";
 import { getFirestore, setDoc, doc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-<<<<<<< HEAD
+
 export type SignUpProps = {
   name: string;
   email: string;
