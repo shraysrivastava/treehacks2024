@@ -1,25 +1,38 @@
 // StudentHome.js
 import React, { useCallback, useEffect, useState } from "react";
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, RefreshControl } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import Subject from "./Subjects/Subject";
 import { SubjectProps } from "./Subjects/Subject";
 import { Colors } from "../../../constants/Colors";
 import { useNavigation } from "@react-navigation/native";
 import { auth, db } from "../../../firebase/firebase";
-import { DocumentData, collection, doc, getDoc, getFirestore } from "firebase/firestore";
+import {
+  DocumentData,
+  collection,
+  doc,
+  getDoc,
+  getFirestore,
+} from "firebase/firestore";
 import { StudentData } from "../../../constants/types";
-
 
 export const StudentHome: React.FC = () => {
   const [studentData, setStudentData] = useState<StudentData>();
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
-  
+
   const [courses, setCourses] = useState<DocumentData>([]);
-  const [subjects, setSubjects] = useState<SubjectProps[]>(
-    [{
+
+  const subjects = [
+    {
       subjectName: "Mathematics",
-      gradeLevel: studentData?.gradeLevel || "1",
+      gradeLevel: studentData?.gradeLevel || "",
       subjectColor: Colors.accent1,
       icon: "calculate",
     },
@@ -35,7 +48,8 @@ export const StudentHome: React.FC = () => {
       subjectColor: Colors.primary,
       icon: "history",
     },
-  ]);
+  ];
+
   const fetchStudentData = async () => {
     const db = getFirestore();
     const user = auth.currentUser;
@@ -52,30 +66,31 @@ export const StudentHome: React.FC = () => {
     }
   };
   const fetchCourses = async (classes: string[]) => {
-  
     // Ensure there are classes to process
     if (!classes || classes.length === 0) {
       console.log("No classes found for the student.");
       return;
     }
-  
+
     const coursesRef = collection(db, "courses");
-  
+
     // Process each class UID to fetch course details
     for (const classUID of classes) {
       try {
         const docRef = doc(coursesRef, classUID); // Direct reference to the course document by UID
         const docSnap = await getDoc(docRef);
-  
+
         if (docSnap.exists()) {
-          setCourses([{
-            subjectName: docSnap.data().courseData.courseName,
-            gradeLevel: docSnap.data().gradeLevel,
-            subjectColor: determineSubjectColor(docSnap.data().courseData.courseName),
-            icon: "book",
-          }]);
-          
-          
+          setCourses([
+            {
+              subjectName: docSnap.data().courseData.courseName,
+              gradeLevel: docSnap.data().gradeLevel,
+              subjectColor: determineSubjectColor(
+                docSnap.data().courseData.courseName
+              ),
+              icon: "book",
+            },
+          ]);
         } else {
           console.log(`No course found for UID: ${classUID}`);
         }
@@ -84,9 +99,8 @@ export const StudentHome: React.FC = () => {
       }
     }
     console.log("Fetched courses:", courses);
-    
   };
-  
+
   // Example function to determine subject color dynamically
   const determineSubjectColor = (subjectName: string) => {
     switch (subjectName?.toLowerCase()) {
@@ -113,12 +127,12 @@ export const StudentHome: React.FC = () => {
       .finally(() => setRefreshing(false));
   }, [fetchStudentData]);
 
-
-
+  
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollView}
+      <ScrollView
+        contentContainerStyle={styles.scrollView}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -130,17 +144,17 @@ export const StudentHome: React.FC = () => {
         }
       >
         <>
-        <Text style={styles.headerText}>Welcome, {studentData?.name}!</Text>
-        {subjects.map((subject, index) => (
-          <Subject
-            key={index}
-            subjectName={subject.subjectName}
-            gradeLevel={subject.gradeLevel}
-            subjectColor={subject.subjectColor}
-            navigation={navigation}
-            icon={subject.icon}
-          />
-        ))}
+          <Text style={styles.headerText}>Welcome, {studentData?.name}!</Text>
+          {subjects.map((subject, index) => (
+            <Subject
+              key={index}
+              subjectName={subject.subjectName}
+              gradeLevel={subject.gradeLevel}
+              subjectColor={subject.subjectColor}
+              navigation={navigation}
+              icon={subject.icon}
+            />
+          ))}
           {courses.map((subject: DocumentData, index: number) => (
             <Subject
               key={index}
@@ -150,7 +164,7 @@ export const StudentHome: React.FC = () => {
               navigation={navigation}
               icon={subject.icon}
             />
-        ))}
+          ))}
         </>
       </ScrollView>
     </SafeAreaView>
