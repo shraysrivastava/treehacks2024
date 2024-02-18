@@ -54,6 +54,10 @@ export const SignUp = (props: SignUpProps) => {
     } else {
       signUpUser({
         name,
+<<<<<<< HEAD
+=======
+        username,
+>>>>>>> 5202e20 (Fix all rebase errors)
         email,
         password,
         accountType,
@@ -219,4 +223,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "lightgray",
   },
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> 5202e20 (Fix all rebase errors)

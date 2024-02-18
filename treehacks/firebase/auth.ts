@@ -84,4 +84,8 @@ const authError = (
 ) => {
   const errorCode: string = error.code;
   setError(errorCode.split("/")[1].replace(/-/g, " "));
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> 5202e20 (Fix all rebase errors)
