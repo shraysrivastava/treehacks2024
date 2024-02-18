@@ -33,13 +33,14 @@ export const signUpUser = ({
   setError,
 }: SignUpProps) => {
   createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
+    .then(async (userCredential) => {
       const user = userCredential.user;
       updateProfile(user, {
         displayName: name,
       }).catch((error: FirebaseError) => authError(error, setError));
 
-      createWallet(email);
+     const walletID = await createWallet(email);
+
       if (accountType === "Teacher") {
         setDoc(doc(db, "users", userCredential.user.uid), {
           name: name,
@@ -47,6 +48,8 @@ export const signUpUser = ({
           accountType: accountType,
           classes: [],
           crossmint: true,
+          walletID: walletID,
+          wallet:[],
         }).catch((error: FirebaseError) => authError(error, setError));
       } else if (accountType === "Student") {
         setDoc(doc(db, "users", userCredential.user.uid), {
@@ -63,6 +66,8 @@ export const signUpUser = ({
           },
           gradeLevel: gradeLevel,
           crossmint: true,
+          walletID: walletID,
+          wallet:[],
         }).catch((error: FirebaseError) => authError(error, setError));
         
       }
@@ -83,7 +88,11 @@ export const signInUser = (
 export const signOutUser = (
   setError: React.Dispatch<React.SetStateAction<string>>
 ) => {
+
+  // createWallet(auth.currentUser?.email!);
+  
   AsyncStorage.removeItem("user");
+  
   signOut(auth).catch((error: FirebaseError) => authError(error, setError));
 };
 

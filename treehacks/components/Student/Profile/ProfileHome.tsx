@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from "react-native";
 import { signOutUser } from "../../../firebase/auth";
 import { auth } from "../../../firebase/firebase";
@@ -43,6 +44,8 @@ export const ProfileHome = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={{ height: 10 }}></View>
+
       <Text style={styles.text}>Profile Home</Text>
       {studentData && (
         <View style={styles.userInfoContainer}>
@@ -55,8 +58,12 @@ export const ProfileHome = () => {
             <Text style={styles.value}>{studentData.email}</Text>
           </View>
           <View style={styles.userInfoItem}>
-            <Text style={styles.label}>Account Type:</Text>
+            <Text style={styles.label}>Account Type: </Text>
             <Text style={styles.value}>{studentData.accountType}</Text>
+          </View>
+          <View style={styles.userInfoItem}>
+            <Text style={styles.label}>Wallet ID: </Text>
+            <Text style={styles.value}>{studentData.walletID?.substring(0, 15)}</Text>
           </View>
           <View style={styles.userInfoItem}>
             <Text style={styles.label}>Points:</Text>
@@ -64,27 +71,35 @@ export const ProfileHome = () => {
               {studentData?.points ? studentData.points : 0}
             </Text>
           </View>
-          {studentData.wallet && (
-            <View>
-              <Text style={styles.label}>My Collection:</Text>
-            <View style={styles.imagesContainer}> 
-            <TouchableOpacity>
-              <Image
-                source={{ uri: studentData.wallet[0].imageUrl}}
-                style={styles.walletImage}
-              />
-            </TouchableOpacity>
-            </View>
-            </View>
-          )}
-        </View>
-      )}
-      <TouchableOpacity
+         
+           <TouchableOpacity
         style={styles.logoutButton}
         onPress={() => signOutUser(setError)}
       >
         <Text style={styles.logoutButtonText}>Logout</Text>
       </TouchableOpacity>
+        </View>
+      )}
+ <Text style={styles.text}>My Collection</Text>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <SafeAreaView style={styles.container}>
+           
+            {studentData &&
+              studentData.wallet.map((item: any, index: any) => (
+                <TouchableOpacity key={index}>
+                  <View style={styles.imageContainer}>
+                    <TouchableOpacity>
+                      <Image
+                        source={{ uri: item.imageUrl }}
+                        style={styles.walletImage}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              ))}
+          </SafeAreaView>
+        </ScrollView>
+      
     </SafeAreaView>
   );
 };
@@ -148,6 +163,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
+    // Center the text
+    justifyContent: "center",
+    alignItems: "center",
+    // Add some margin to the top
+    marginLeft: 30,
+    marginRight: 30,
   },
   logoutButtonText: {
     color: "#fff", // White text color
@@ -160,4 +181,18 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     resizeMode: "contain",
   },
+  imageContainer: {
+    width: 200,
+    height: 200,
+    margin: 5,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  scrollContainer: {
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
+
+  },
+  
 });

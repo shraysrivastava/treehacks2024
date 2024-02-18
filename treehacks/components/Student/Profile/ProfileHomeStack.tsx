@@ -18,7 +18,7 @@ export const ProfileHomeStack = () => {
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.primary },
           }}>
-      <Stack.Screen name="ProfileHome" component={ProfileHome} />
+      <Stack.Screen name="My Profile" component={ProfileHome} />
     </Stack.Navigator>
   );
 };

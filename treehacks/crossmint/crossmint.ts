@@ -1,6 +1,6 @@
 import axios from 'axios';
-import queryString from 'query-string';
 import { crossmintAPIKey } from '../firebase/api';
+import queryString from 'query-string';
 
 
 function generateID() { 
@@ -17,13 +17,14 @@ function generateID() {
 
 
 export const createNFT = async (email:string, imageUrl:string) => {
+    
     try {
       const apiKey = crossmintAPIKey; // Replace '<api-key>' with your actual API key
-      const collectionId = 'educa'; // Replace '<collection-id>' with your actual collection ID
+      const collectionId = "default-solana"; // Replace '<collection-id>' with your actual collection ID
       const animationUrl = imageUrl; // Replace '<string>' with your actual animation URL
       const traitType = 'educad'; // Replace '<string>' with your actual trait type
       const value = generateID(); // Replace '<string>' with your actual value
-      const recipientEmail = "email:"+email+":polygon";
+      const recipientEmail = "email:"+email+":default-solana";
   
       const options = {
         headers: {
@@ -43,10 +44,10 @@ export const createNFT = async (email:string, imageUrl:string) => {
               value: value,
             },
           ],
-          // Generate a random number
-          description: 'A really awesome dog that will be with you forever!',
+          
+          description: 'A really awesome creature that will be with you forever.',
           image: 'https://www.crossmint.com/assets/crossmint/logo.png',
-          name: 'DOGGO NFT #'+Math.floor(Math.random() * 1000),
+          name: 'CUTE CREATURE '+ Math.floor(Math.random() * 1000),
         },
         recipient: recipientEmail,
         reuploadLinkedFiles: true,
@@ -55,18 +56,24 @@ export const createNFT = async (email:string, imageUrl:string) => {
   
       const response = await axios.post(
         `https://staging.crossmint.com/api/2022-06-09/collections/${collectionId}/nfts`,
-    queryString.stringify(requestBody),
+           
+          queryString.stringify(requestBody),
         options
       );
-    
+        
       console.log(response.data);
+      return response.data["id"];
     } catch (error) {
-      console.error(error);
+
+     // console.error(error);
+      return "";
+      // print line
     }
+    return "";
   };
   
 
-export const createWallet = async (email: string) => {
+export const createWallet = async function(email: string) {
     try {
     
       const options = {
@@ -83,12 +90,14 @@ export const createWallet = async (email: string) => {
       console.log(requestBody);
       const response = await axios.post(
         'https://staging.crossmint.com/api/v1-alpha1/wallets',
-        queryString.stringify(requestBody),
+        requestBody,
         options
       );
-  
+    
       console.log(response.data);
+      return response.data["publicKey"];
     } catch (error) {
       console.error(error);
+      return "";
     }
   };
