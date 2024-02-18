@@ -110,10 +110,6 @@ export const Physics = () => {
   const handleAnswerSelect = async (selectedAnswer: string) => {
     if (selectedAnswer === questionData?.answer) {
       setToast({ message: "Correct!", color: Colors.toastSuccess });
-      const newPoints = studentData?.points + 1;
-      const newLeaderBoardPoints = studentData?.leaderBoardPoints + 1;
-      const newSciencePoints = studentData?.subjectPoints.sciencePoints + 1;
-      updatePoints(newPoints, newLeaderBoardPoints, newSciencePoints);
     } else {
       setToast({ message: "Try Again.", color: Colors.toastError });
       setShowFeedback(true); // Show feedback if the answer is wrong
@@ -132,35 +128,6 @@ export const Physics = () => {
     // Proceed to fetch the next question only if the answer is correct
     fetchRandomQuestion();
   };
-
-//   const updatePoints = async (
-//     newPoints: number,
-//     newLeaderBoardPoints: number,
-//     newSciencePoints: number
-//   ) => {
-//     const db = getFirestore();
-//     const user = auth.currentUser;
-
-//     if (user) {
-//       const docRef = doc(db, "users", user.uid);
-//       const studentSubjectPoints = studentData?.subjectPoints;
-//       const updatedSubjectPoints = {
-//         ...studentSubjectPoints,
-//         sciencePoints: newSciencePoints,
-//       };
-
-//       try {
-//         await updateDoc(docRef, {
-//           points: newPoints,
-//           newLeaderBoardPoints: newLeaderBoardPoints,
-//           subjectPoints: updatedSubjectPoints,
-//         });
-//         setPointsUpdated(true);
-//       } catch (error) {
-//         console.error("Error updating points:", error);
-//       }
-//     }
-//   };
 
   const url: string = "https://api.together.xyz/v1/chat/completions";
   const apiKey: string =
