@@ -21,6 +21,7 @@ import { auth } from "../../../../firebase/firebase";
 import { Colors } from "../../../../constants/Colors";
 import CustomToast, { ToastProps } from "../../../../constants/Toast";
 const { width } = Dimensions.get("window");
+import Skip from "../../../Skip";
 
 export const History = () => {
   const [questionData, setQuestionData] = useState<DocumentData>();
@@ -222,6 +223,7 @@ export const History = () => {
               </Text>
             </View>
           )}
+          <Skip onPress={fetchRandomQuestion}></Skip>
         </View>
       )}
       <CustomToast message={toast.message} color={toast.color}/>
@@ -242,7 +244,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   questionText: {
-    fontSize: 50,
+    fontSize: 33,
     marginBottom: 20,
     color: Colors.secondary,
   },
@@ -257,7 +259,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonText: {
-    fontSize: 35,
+    fontSize: 28,
     color: Colors.secondary,
   },
   feedbackContainer: {

@@ -27,7 +27,7 @@ const Subject = ({
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.subjectText}>{subjectName}</Text>
-        <Text style={styles.gradeText}>Grade: {gradeLevel}</Text>
+        <Text style={styles.gradeText}>{gradeLevel}</Text>
       </View>
     </TouchableOpacity>
   );

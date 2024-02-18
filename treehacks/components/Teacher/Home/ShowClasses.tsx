@@ -3,51 +3,45 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-nati
 import { TeacherData } from "../../../constants/types";
 import { Colors } from "../../../constants/Colors";
 import { NavigationProp } from '@react-navigation/native';
-import { CreateCourse } from "./CreateCourse";
+import { MaterialIcons } from "@expo/vector-icons";
 
 interface ShowClassesProps {
   teacherData: TeacherData;
-  navigation: NavigationProp<any>; // Consider using a more specific type for better type safety
+  navigation: NavigationProp<any>;
 }
 
 export const ShowClasses: React.FC<ShowClassesProps> = ({ teacherData, navigation }) => {
-  // Convert classes object into an array of [className, students] tuples
   const classesArray = Object.entries(teacherData.classes);
-  // console.log("here" + classesArray);
 
   if (classesArray.length === 0) {
-    return <Text>You don't have any classes yet. Would you like to create one?</Text>;
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>You don't have any classes yet. Would you like to create one?</Text>
+      </View>
+    );
   }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.headerText}>Your Classes</Text>
-      {classesArray.map(([className, students], index) => (
+      {classesArray.map(([className], index) => (
         <TouchableOpacity
           key={index}
           style={styles.classContainer}
-          onPress={() => navigation.navigate("Manage Students", { className, students, teacherData })}
+          onPress={() => navigation.navigate("Manage Students", { className, teacherData })}
         >
           <Text style={styles.classText}>{className}</Text>
+          <MaterialIcons name="navigate-next" size={24} color={Colors.textSecondary} />
         </TouchableOpacity>
       ))}
-    </ScrollView> 
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: Colors.background,
-  borderRadius: 8,
-  padding: 15,
-  marginVertical: 8,
-  marginHorizontal: 16,
-  shadowColor: "#000",
-  shadowOffset: { width: 0, height: 1 },
-  shadowOpacity: 0.22,
-  shadowRadius: 2.22,
-  elevation: 3,
+    padding: 15,
   },
   headerText: {
     fontSize: 22,
@@ -56,16 +50,34 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   classContainer: {
-    width: "100%",
+    backgroundColor: Colors.primary, // Consider using a lighter shade for better readability
+    borderRadius: 10,
     padding: 20,
-    marginVertical: 8,
-    backgroundColor: Colors.primary,
-    borderRadius: 5,
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 4,
   },
   classText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: Colors.textPrimary,
+    color: Colors.textSecondary,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: 'center',
   },
 });
+

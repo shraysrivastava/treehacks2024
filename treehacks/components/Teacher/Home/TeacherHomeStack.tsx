@@ -25,21 +25,20 @@ const Stack = createStackNavigator<TeacherHomeStackParamsList>();
 export const TeacherHomeStack: React.FC = () => {
   return (
     <Stack.Navigator
-      initialRouteName="TeacherHome"
+      initialRouteName="Home"
       screenOptions={{
         gestureEnabled: true,
         gestureDirection: "horizontal",
         headerShown: true,
         headerTintColor: "#fff",
         headerBackTitleVisible: false,
-        headerStyle: { backgroundColor: Colors.secondary },
+        headerStyle: { backgroundColor: Colors.primary },
       }}
     >
 
       <Stack.Screen name="Home" component={TeacherHome} />
       <Stack.Screen name="Manage Students" component={ShowStudents} />
       <Stack.Screen name="CreateCourse" component={CreateCourse} />
-      <Stack.Screen name="TeacherHome" component={TeacherHome} />
 
     </Stack.Navigator>
   );

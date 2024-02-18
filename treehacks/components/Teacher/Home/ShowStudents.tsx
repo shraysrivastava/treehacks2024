@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,102 +7,94 @@ import {
   RefreshControl,
   TextInput,
   TouchableOpacity,
-} from "react-native";
-import { Classes, StudentData, TeacherData } from "../../../constants/types";
+  Platform,
+} from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { auth, db } from '../../../firebase/firebase';
+import { Colors } from '../../../constants/Colors';
+import CustomToast, { ToastProps } from '../../../constants/Toast';
+import { StudentProgress } from './StudentProgressModals';
+import { useNavigation } from '@react-navigation/native';
+import { TeacherData, StudentData } from '../../../constants/types';
 import {
   doc,
+  getDoc,
   updateDoc,
   arrayUnion,
   query,
   collection,
   where,
   getDocs,
-  runTransaction,
-  getDoc,
-} from "firebase/firestore";
-import { auth, db } from "../../../firebase/firebase";
-import { Colors } from "../../../constants/Colors";
-import {
-  RouteProp,
-  useFocusEffect,
-  useNavigation,
-} from "@react-navigation/native";
-import { MaterialIcons } from "@expo/vector-icons";
-import CustomToast, { ToastProps } from "../../../constants/Toast";
-import { StudentProgress } from "./StudentProgressModals";
-import { CreateCourse } from "./CreateCourse";
-import { ProfileHome } from "../Profile/ProfileHome";
-import { TeacherHomeNavigationProps } from "./TeacherHomeStack";
+} from 'firebase/firestore';
 
 interface ShowStudentsProps {
-  route: RouteProp<{ params: { className: string } }, "params">;
+  route: {
+    params: {
+      className: string;
+    };
+  };
 }
+
 export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
   const { className } = route.params;
   const [teacherData, setTeacherData] = useState<TeacherData>();
-  const user = auth.currentUser;
   const [studentData, setStudentData] = useState<StudentData[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [email, setEmail] = useState("");
-  const [toast, setToast] = useState<ToastProps>({ message: "", color: "" });
+  const [email, setEmail] = useState('');
+  const [toast, setToast] = useState<ToastProps>({ message: '', color: '' });
   const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const navigation = useNavigation();
+  const [coursePath, setCoursePath] = useState<String>('');
 
-  const fetchTeacherData = async () => {
-    try {
+  useEffect(() => {
+    const fetchTeacherData = async () => {
       const user = auth.currentUser;
-      if (!user) throw new Error("Authentication required");
-      const docRef = doc(db, "users", user.uid);
+      if (!user) {
+        setToast({ message: 'Authentication required', color: Colors.toastError });
+        return;
+      }
+      const docRef = doc(db, 'users', user.uid);
       const docSnap = await getDoc(docRef);
-
-      if (!docSnap.exists()) throw new Error("No such document!");
+      if (!docSnap.exists()) {
+        setToast({ message: 'Teacher data not found', color: Colors.toastError });
+        return;
+      }
       setTeacherData(docSnap.data() as TeacherData);
-      //const coursePath = teacherData?.name + "-" + className;
-    } catch (error) {
-      console.error("Fetch teacher data failed:", error);
-      setToast({ message: "Failed to fetch teacher data", color: "red" });
-    }
-  };
+    };
+
+    fetchTeacherData();
+    if (teacherData) setCoursePath(`${teacherData?.name}=${className}`);
+  }, []);
 
   const fetchStudentData = useCallback(async () => {
-    try {
-      if (!teacherData) return;
-      const studentEmails = teacherData.classes[className];
-      if (!studentEmails || studentEmails.length === 0) return;
-      const studentsQuery = query(
-        collection(db, "users"),
-        where("email", "in", studentEmails)
-      );
-      const querySnapshot = await getDocs(studentsQuery);
-      const fetchedStudents = querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      })) as StudentData[];
-      setStudentData(fetchedStudents);
-    } catch (error) {
-      console.error("Error fetching students:", error);
-      setToast({ message: "Failed to fetch students", color: "red" });
-    }
+    if (!teacherData) return;
+    const studentEmails = teacherData.classes[className];
+    if (!studentEmails || studentEmails.length === 0) return;
+    const studentsQuery = query(collection(db, 'users'), where('email', 'in', studentEmails));
+    const querySnapshot = await getDocs(studentsQuery);
+    
+    const fetchedStudents = querySnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    })) as StudentData[];
+    setStudentData(fetchedStudents);
   }, [className, teacherData]);
 
   useEffect(() => {
     fetchStudentData();
-  //  / fetchTeacherData();
-  }, [fetchStudentData,]);
+  }, [fetchStudentData]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchTeacherData()
-      .then(fetchStudentData)
-      .finally(() => setRefreshing(false));
+    fetchStudentData().finally(() => setRefreshing(false));
   }, [fetchStudentData]);
 
   useEffect(() => {
-    if (toast.message !== "") {
+    if (toast.message !== '') {
       toastTimeoutRef.current = setTimeout(() => {
-        setToast({ message: "", color: "" });
-      }, 2000);
+        setToast({ message: '', color: '' });
+      }, 3000);
     }
-
     return () => {
       if (toastTimeoutRef.current) {
         clearTimeout(toastTimeoutRef.current);
@@ -110,106 +102,52 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
     };
   }, [toast.message]);
 
-  const isValidEmail = () => {
-    const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/; // Simple regex for email validation
-    return regex.test(email);
-  };
-
   const addStudentToClass = async () => {
-    if (!isValidEmail()) {
-      console.log("Invalid email format");
-      setToast({ message: "Invalid email format", color: Colors.toastError });
+    if (!email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
+      setToast({ message: 'Invalid email format', color: Colors.toastError });
       return;
     }
-
-    if (!user) {
-      console.log("User not authenticated");
-      setToast({ message: "User not authenticated", color: Colors.toastError });
+    if (!teacherData) {
+      setToast({ message: 'Teacher data not found', color: Colors.toastError });
       return;
     }
-
-    try {
-      const userDocRef = doc(db, "users", user.uid);
-      const docSnap = await getDoc(userDocRef);
-
-      if (!docSnap.exists()) {
-        console.log("Document does not exist");
-        setToast({
-          message: "Document does not exist",
-          color: Colors.toastError,
-        });
-        return;
-      }
-
-      const userData = docSnap.data();
-      const classesMap = userData.classes || {};
-      const studentsArray = classesMap[className] || [];
-
-      if (studentsArray.includes(email)) {
-        console.log("Student already in class");
-        setToast({
-          message: "Student already in class",
-          color: Colors.toastError,
-        });
-        return;
-      }
-
-      studentsArray.push(email);
-
-      // Update the classes map with the new array of students
-      await updateDoc(userDocRef, {
-        [`classes.${className}`]: studentsArray,
-      });
-
-      // Now, find and update the student's document with the new course
-      const studentsQuery = query(
-        collection(db, "users"),
-        where("email", "==", email)
-      );
-      const querySnapshot = await getDocs(studentsQuery);
-
-      if (!querySnapshot.empty) {
-        const studentDocRef = querySnapshot.docs[0].ref; // Assuming email is unique, there should only be one document
-        const courseName = `${userData.name}=${className}`; // Format: teacherName=courseName
-
-        await updateDoc(studentDocRef, {
-          classes: arrayUnion(courseName),
-        });
-      } else {
-        console.log("Student not found");
-        setToast({ message: "Student not found", color: Colors.toastError });
-        return;
-      }
-
-      console.log("Student added to class successfully");
-      setEmail("");
-      setToast({
-        message: "Student added to class successfully",
-        color: Colors.toastSuccess,
-      });
-      // Refresh to reflect the update
-    } catch (err) {
-      console.error("Transaction failed: ", err);
-      setToast({ message: "Transaction failed", color: Colors.toastError });
+    const studentsArray = teacherData.classes[className] || [];
+    if (studentsArray.includes(email)) {
+      setToast({ message: 'Student already in class', color: Colors.toastError });
+      return;
     }
+    studentsArray.push(email);
+    const userDocRef = doc(db, 'users', auth.currentUser!.uid);
+    await updateDoc(userDocRef, {
+      [`classes.${className}`]: studentsArray,
+    });
+    const studentsQuery = query(collection(db, 'users'), where('email', '==', email));
+    const querySnapshot = await getDocs(studentsQuery);
+    if (!querySnapshot.empty) {
+      const studentDocRef = querySnapshot.docs[0].ref;
+      const courseName = `${teacherData.name}=${className}`;
+      await updateDoc(studentDocRef, {
+        classes: arrayUnion(courseName),
+      });
+      setToast({ message: 'Student added to class successfully', color: Colors.toastSuccess });
+      fetchStudentData();
+    } else {
+      setToast({ message: 'Student not found', color: Colors.toastError });
+    }
+    setEmail('');
   };
 
-  console.log("SD: " + studentData.length);
-
-  const navigation = useNavigation<TeacherHomeNavigationProps>();
-  
-  const coursePath = teacherData?.name + "=" + className;
   return (
     <View style={styles.container}>
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={styles.listContainer}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={[Colors.secondary]}
-            tintColor={Colors.secondary}
-            progressBackgroundColor="#ffffff"
+            colors={[Colors.primary]}
+            tintColor={Colors.primary}
+            progressBackgroundColor="#fff"
           />
         }
       >
@@ -217,110 +155,92 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.TextInput}
-            placeholder="Email"
+            placeholder="Student Email"
+            placeholderTextColor={Colors.lightgray}
             autoCapitalize="none"
             keyboardType="email-address"
             value={email}
-            onChangeText={(text) => setEmail(text)}
+            onChangeText={setEmail}
           />
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={addStudentToClass}
-          >
+          <TouchableOpacity style={styles.addButton} onPress={addStudentToClass}>
             <MaterialIcons name="add" size={24} color={Colors.background} />
           </TouchableOpacity>
         </View>
-
         {studentData.length > 0 ? (
           studentData.map((student, index) => (
             <StudentProgress
+              key={student.id + index.toString()}
               student={student}
-              studentKey={student.id + index.toString() + student.email}
+              studentKey={student.id}
             />
           ))
         ) : (
-          <Text style={styles.text}>
-            There are no students in this class yet.
-          </Text>
+          <Text style={styles.text}>There are no students in this class yet.</Text>
         )}
-        <CustomToast message={toast.message} color={toast.color} />
-        <TouchableOpacity
-          style={styles.classContainer}
-          onPress={() => navigation.navigate("CreateCourse", { coursePath })}
-        >
-          <Text style={styles.addButtonText}>Create Course</Text>
-        </TouchableOpacity>
       </ScrollView>
+      <TouchableOpacity
+        style={styles.createCourseButton}
+        onPress={() => navigation.navigate('CreateCourse', { coursePath })}
+      >
+        <Text style={styles.createCourseButtonText}>Create Course</Text>
+      </TouchableOpacity>
+      <CustomToast message={toast.message} color={toast.color} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    padding: 10,
+    flex: 1,
     backgroundColor: Colors.background,
   },
-  text: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginVertical: 4,
-    color: Colors.textPrimary,
+  listContainer: {
+    padding: 15,
   },
   headerText: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: 'bold',
+    color: Colors.textPrimary,
+    marginBottom: 20,
+  },
+  inputContainer: {
+    flexDirection: 'row',
     marginBottom: 20,
   },
   TextInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#e0e0e0",
-    padding: 10,
-    margin: 5,
+    borderColor: Colors.lightgray,
     borderRadius: 10,
-    backgroundColor: "white",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
+    padding: 10,
+    marginRight: 10,
+    backgroundColor: 'white',
+    color: Colors.textPrimary,
   },
   addButton: {
-    margin: 5,
     padding: 10,
-    alignItems: "center",
-    backgroundColor: Colors.accent1,
-    borderRadius: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  addButtonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    marginVertical: 10,
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  classContainer: {
-    width: "100%",
-    padding: 20,
-    marginVertical: 8,
     backgroundColor: Colors.primary,
-    borderRadius: 5,
-    alignItems: "center",
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  createCourseButton: {
+    padding: 15,
+    backgroundColor: Colors.primary,
+    borderRadius: 10,
+    marginHorizontal: 15,
+    marginBottom: Platform.OS === 'ios' ? 20 : 15,
+    alignItems: 'center',
+  },
+  createCourseButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
