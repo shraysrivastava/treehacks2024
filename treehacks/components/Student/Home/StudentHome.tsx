@@ -50,6 +50,12 @@ export const StudentHome: React.FC = () => {
       subjectColor: Colors.primary,
       icon: "history",
     },
+    {
+      subjectName: "Physics",
+      gradeLevel: studentData?.gradeLevel || "1",
+      subjectColor: Colors.secondary,
+      icon: "book"
+    }
   ];
 
   const fetchStudentData = async () => {
