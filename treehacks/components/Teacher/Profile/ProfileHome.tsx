@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -64,19 +63,6 @@ export const ProfileHome = () => {
         style={styles.logoutButton}
         onPress={() => signOutUser(setError)}
       >
-=======
-import React, { useState } from "react";
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from "react-native";
-import { signOutUser } from "../../../firebase/auth";
-
-export const ProfileHome = () => {
-  const [error, setError] = useState('');
-  
-  return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.text}>Profile Home</Text>
-      <TouchableOpacity style={styles.logoutButton} onPress={() => signOutUser(setError)}>
->>>>>>> b7b8011 (Cat generator)
         <Text style={styles.logoutButtonText}>Logout</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -96,7 +82,6 @@ const styles = StyleSheet.create({
     color: "#333", // Darker text color for better readability
     marginBottom: 20, // Adds some space before the logout button
   },
-<<<<<<< HEAD
   userInfoContainer: {
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -125,8 +110,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#555",
   },
-=======
->>>>>>> b7b8011 (Cat generator)
   logoutButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
