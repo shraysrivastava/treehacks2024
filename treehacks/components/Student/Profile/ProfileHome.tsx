@@ -5,6 +5,7 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import { signOutUser } from "../../../firebase/auth";
 import { auth } from "../../../firebase/firebase";
@@ -57,6 +58,18 @@ export const ProfileHome = () => {
             <Text style={styles.label}>Account Type:</Text>
             <Text style={styles.value}>{studentData.accountType}</Text>
           </View>
+          <View style={styles.userInfoItem}>
+            <Text style={styles.label}>Points:</Text>
+            <Text style={styles.value}>
+              {studentData?.points ? studentData.points : 0}
+            </Text>
+          </View>
+          {studentData.wallet && (
+            <Image
+              source={{ uri: studentData.wallet[0].imageUrl}}
+              style={styles.walletImage}
+            />
+          )}
         </View>
       )}
       <TouchableOpacity
@@ -127,5 +140,10 @@ const styles = StyleSheet.create({
     color: "#fff", // White text color
     fontSize: 16,
     fontWeight: "bold",
+  },
+  walletImage: {
+    width: 100,
+    height: 100,
+    resizeMode: "contain",
   },
 });
