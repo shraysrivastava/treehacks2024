@@ -11,7 +11,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export type SignUpProps = {
   name: string;
-  username: string;
   email: string;
   password: string;
   accountType: string;
@@ -21,7 +20,6 @@ export type SignUpProps = {
 
 export const signUpUser = ({
   name,
-  username,
   email,
   password,
   accountType,
@@ -40,17 +38,14 @@ export const signUpUser = ({
         setDoc(doc(db, "users", userCredential.user.uid), {
           name: name,
           email: email,
-          username: username,
           accountType: accountType,
           classes: [],
-          school: "",
         }).catch((error: FirebaseError) => authError(error, setError));
       } else if (accountType === "Student") {
         setDoc(doc(db, "users", userCredential.user.uid), {
           id: userCredential.user.uid,
           name: name,
           email: email,
-          username: username,
           accountType: accountType,
           classes: [],
           points: 0,

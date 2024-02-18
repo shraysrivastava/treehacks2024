@@ -19,10 +19,11 @@ export const StudentHomeStack = () => {
         headerShown: true,
         headerTintColor: "#fff",
         headerBackTitleVisible: false,
-        headerStyle: { backgroundColor: Colors.primary },
+        headerStyle: { backgroundColor: Colors.primary,  },
+        headerTitleStyle: { fontWeight: "bold", color: Colors.background}
       }}
     >
-      <Stack.Screen name="StudentHome" component={StudentHome} />
+      <Stack.Screen name="Dashboard" component={StudentHome} />
       <Stack.Screen name="Mathematics" component={Mathematics} />
       <Stack.Screen name="Science" component={Science} />
       <Stack.Screen name="History" component={History} />

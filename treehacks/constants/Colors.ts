@@ -1,15 +1,15 @@
 export const Colors = {
-  background: "#030003", // black
+  background: "white", // black
   primary: "#007aff", // blueish
-  secondary: "white", // white
-  accent1: "#00ff62", // greenish
-  accent2: "#ff003a", //redish
+  secondary: "#030003", // white
+  accent1: "#00c04a", // greenish
+  accent2: "#ff003a", //redish#030003
   blue: "blue",
   red: "red",
   green: "green",
   toastSuccess: "green",
   toastError: "red",
   lightgray: "lightgray",
-  textPrimary: "white",
-  textSecondary: "black",
+  textPrimary: "black",
+  textSecondary: "white",
 };

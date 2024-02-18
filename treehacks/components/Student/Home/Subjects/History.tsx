@@ -3,11 +3,13 @@ import {
   View,
   Text,
   TouchableOpacity,
+  ScrollView,
   StyleSheet,
   Dimensions,
 } from "react-native";
 import {
   DocumentData,
+  addDoc,
   collection,
   doc,
   getDoc,
@@ -18,15 +20,18 @@ import {
 import { auth } from "../../../../firebase/firebase";
 import { Colors } from "../../../../constants/Colors";
 import CustomToast, { ToastProps } from "../../../../constants/Toast";
-
 const { width } = Dimensions.get("window");
 
 export const History = () => {
   const [questionData, setQuestionData] = useState<DocumentData>();
   const [studentData, setStudentData] = useState<DocumentData>();
   const [pointsUpdated, setPointsUpdated] = useState(false);
+  const [question, setQuestion] = useState("");
+  const [correctAnswer, setCorrectAnswer] = useState("");
+  const [incorrectAnswers, setIncorrectAnswers] = useState<string[]>([]);
   const [toast, setToast] = useState<ToastProps>({ message: "", color: "" });
   const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [topics, setTopics] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchStudentData = async () => {
@@ -50,6 +55,7 @@ export const History = () => {
 
   useEffect(() => {
     if (studentData) {
+      fetchGeneratedQuestion();
       fetchRandomQuestion();
     }
   }, [studentData]);
@@ -68,6 +74,69 @@ export const History = () => {
     };
   }, [toast.message]);
 
+  const url: string = 'https://api.together.xyz/v1/chat/completions';
+  const apiKey: string = '77712fb6e31d5284a3c4015b53a49f6c4a9d093e29232cef4ff609c5c935a7d6';
+  const fetchGeneratedQuestion = async () => {
+    const headers: HeadersInit = new Headers({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    });
+
+    const data: { model: string, max_tokens: number, messages: { role: string, content: string }[] } = {
+      model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+      max_tokens: 1024,
+      messages: [
+        {
+          role: 'system',
+          content: 'You are an AI assistant'
+        },
+        {
+          role: 'user',
+          content: `Create a new US history question for a student of ${studentData?.gradeLevel} grade level. The question should not be in ${topics} Give one correct answer, and three wrong answers.
+          make sure the first line of your response is the question. the first line is the correct answer. and the 6th line onwards are incorrect answers`
+        }
+      ]
+    };
+
+    const options = {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(data)
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const result = await response.json();
+      const generatedQuestion = result.choices[0].message.content;
+      // Split the string into lines
+      const lines = generatedQuestion.split('\n');
+
+      // Extract question
+      setQuestion(lines[0].replace('Question: ', ''))
+
+      setCorrectAnswer(lines[2].replace('Correct answer: ', ''))
+
+      setIncorrectAnswers(lines.slice(6).map((line: string) => line.replace(/^\d+\. /, '')))
+
+      setTopics(prevTopics => [...prevTopics, question])
+
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const postGeneratedQuestion = async () => {
+    const db = getFirestore();
+    await addDoc(collection(db, `grade-${studentData?.gradeLevel}History`), {
+      question: question,
+      answer: correctAnswer,
+      wrongAnswer1: incorrectAnswers[0],
+      wrongAnswer2: incorrectAnswers[1],
+      wrongAnswer3: incorrectAnswers[2],
+    });
+  };
+
+  postGeneratedQuestion();
   const fetchRandomQuestion = async () => {
     const db = getFirestore();
     const collectionRef = collection(
@@ -103,7 +172,6 @@ export const History = () => {
     } else {
       setToast({ message: "Try Again.", color: Colors.toastError });
     }
-
     fetchRandomQuestion();
   };
 
@@ -132,7 +200,7 @@ export const History = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: Colors.background }]}>
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: Colors.background }]}>
       {questionData && (
         <View style={styles.questionContainer}>
           <Text style={[styles.questionText, { color: Colors.secondary }]}>
@@ -155,13 +223,13 @@ export const History = () => {
         </View>
       )}
       <CustomToast message={toast.message} color={toast.color} />
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
   },
