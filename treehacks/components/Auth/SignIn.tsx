@@ -16,8 +16,12 @@ export const SignIn = (props: SignInProps) => {
 
   return (
     <SafeAreaView style={styles.parentContainer}>
+      <Image 
+          source={require('../../assets/logo.png')} 
+          style={styles.logo} 
+        />
 
-      <Text style={styles.signInText}>Welcome!</Text>
+      <Text style={styles.signInText}>Welcome to MindMint!</Text>
       <TextInput
         style={styles.TextInput}
         placeholder="Email"
@@ -98,11 +102,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'red',
   },
-  // Add your image style here
   logo: {
     width: 400,
     height: 150,
     marginBottom: 20,
     marginLeft: 30,
+    resizeMode: 'contain',
   },
 });
