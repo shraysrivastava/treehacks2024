@@ -66,30 +66,23 @@ export const StudentHome: React.FC = () => {
     }
   };
   const fetchCourses = async (classes: string[]) => {
-<<<<<<< HEAD
     // Ensure there are classes to process
-=======
   
->>>>>>> b603ffaa3d9a2a321c9199c2fc81da2ceb9f37cd
     if (!classes || classes.length === 0) {
       console.log("No classes found for the student.");
       return;
     }
 
     const coursesRef = collection(db, "courses");
-<<<<<<< HEAD
 
     // Process each class UID to fetch course details
-=======
   
->>>>>>> b603ffaa3d9a2a321c9199c2fc81da2ceb9f37cd
     for (const classUID of classes) {
       try {
         const docRef = doc(coursesRef, classUID); 
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-<<<<<<< HEAD
           setCourses([
             {
               subjectName: docSnap.data().courseData.courseName,
@@ -100,7 +93,6 @@ export const StudentHome: React.FC = () => {
               icon: "book",
             },
           ]);
-=======
           setCourses([{
             subjectName: docSnap.data().courseData.courseName,
             gradeLevel: "Teacher Assigned Work",
@@ -109,7 +101,6 @@ export const StudentHome: React.FC = () => {
           }]);
           
           
->>>>>>> b603ffaa3d9a2a321c9199c2fc81da2ceb9f37cd
         } else {
           console.log(`No course found for UID: ${classUID}`);
         }
@@ -119,12 +110,9 @@ export const StudentHome: React.FC = () => {
     }
     console.log("Fetched courses:", courses);
   };
-<<<<<<< HEAD
 
   // Example function to determine subject color dynamically
-=======
   
->>>>>>> b603ffaa3d9a2a321c9199c2fc81da2ceb9f37cd
   const determineSubjectColor = (subjectName: string) => {
     switch (subjectName?.toLowerCase()) {
       case "mathematics":
@@ -180,19 +168,6 @@ export const StudentHome: React.FC = () => {
         }
       >
         <>
-<<<<<<< HEAD
-          <Text style={styles.headerText}>Welcome, {studentData?.name}!</Text>
-          {subjects.map((subject, index) => (
-            <Subject
-              key={index}
-              subjectName={subject.subjectName}
-              gradeLevel={subject.gradeLevel}
-              subjectColor={subject.subjectColor}
-              navigation={navigation}
-              icon={subject.icon}
-            />
-          ))}
-=======
         <Text style={styles.headerText}>Welcome, {studentData?.name}!</Text>
         {subjects.map((subject, index) => (
           <Subject
@@ -204,7 +179,6 @@ export const StudentHome: React.FC = () => {
             icon={subject.icon}
           />
         ))}
->>>>>>> b603ffaa3d9a2a321c9199c2fc81da2ceb9f37cd
           {courses.map((subject: DocumentData, index: number) => (
             <Subject
               key={index}
