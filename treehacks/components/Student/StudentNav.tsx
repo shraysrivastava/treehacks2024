@@ -61,9 +61,10 @@ export const StudentNav = () => {
           <Tab.Screen
             name="Leaderboard"
             component={LeaderBoard}
+
             options={() => ({
                 tabBarIcon: ({ color, size }) => (
-                    <MaterialIcons name="savings" color={color} size={size} />
+                    <MaterialIcons name="leaderboard" color={color} size={size} />
               ),
             })}
           />   

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Animated } from 'react-native';
 import { db } from '../../firebase/firebase';
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { StudentData } from '../../constants/types';
 import { Colors } from '../../constants/Colors';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { BarChart } from 'react-native-svg-charts';
 
 export const LeaderBoard = () => {
   const [students, setStudents] = useState<StudentData[]>();
@@ -18,26 +20,31 @@ export const LeaderBoard = () => {
 
     fetchStudents();
   }, []);
-if (!students) {
+
+  if (!students) {
     return (
-    <View style={styles.loadingContainer}>
-    <ActivityIndicator size="large" color={Colors.primary} />
-  </View>
-    )
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
   }
-  
+
+  const pointsData = students.map(student => student.points);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Leaderboard</Text>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Leaderboard 🏆</Text>
       <ScrollView style={styles.listContainer}>
-        {students.map((student:StudentData, index) => (
-          <View key={index} style={styles.listItem}>
+        {students.map((student: StudentData, index) => (
+          <Animated.View key={index} style={[styles.listItem, { opacity: 1 - index * 0.1 }]}>
+            <Text style={styles.rank}>{index + 1}</Text>
             <Text style={styles.name}>{student.name}</Text>
             <Text style={styles.points}>{student.points} points</Text>
-          </View>
+          </Animated.View>
         ))}
       </ScrollView>
-    </View>
+      <Text style={styles.graphTitle}>Points Distribution 📊</Text>
+    </SafeAreaView>
   );
 };
 
@@ -51,6 +58,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: Colors.primary,
   },
   listContainer: {
     width: '100%',
@@ -61,19 +69,49 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
+    backgroundColor: 'white',
+    borderRadius: 5,
+    marginVertical: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  rank: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginRight: 10,
+    color: Colors.secondary,
   },
   name: {
     flex: 1,
     fontSize: 18,
+    color: Colors.textPrimary,
   },
   points: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: Colors.primary,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Colors.background,
+  },
+  graphTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 20,
+    color: Colors.primary,
+  },
+  chart: {
+    height: 200,
+    width: '100%',
+    marginTop: 10,
   },
 });
