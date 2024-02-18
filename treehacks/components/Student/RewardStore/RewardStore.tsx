@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity, Text, StyleSheet, SafeAreaView, Button, Image, ActivityIndicator, ScrollView } from "react-native";
 import { togetherClient, TogetherImageModel } from 'together-ai-sdk';
 import { auth } from "../../../firebase/firebase";
-import { FirebaseError } from "firebase/app";
 import { getFirestore, updateDoc, doc, collection, addDoc } from "firebase/firestore";
 import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
 import axios from 'axios';
-import { baseDir, uploaderEndpoint, uploaderKey } from "./api";
+import { baseDir, togetherAPIKey, uploaderEndpoint, uploaderKey } from "./api";
 import queryString from 'query-string';
 
 export const RewardStoreHome = () => {
@@ -21,7 +20,7 @@ export const RewardStoreHome = () => {
 
     const makeApiCall = async () => {
         try {
-            const client = togetherClient({ apiKey: '77712fb6e31d5284a3c4015b53a49f6c4a9d093e29232cef4ff609c5c935a7d6' });
+            const client = togetherClient({ apiKey: togetherAPIKey });
             console.log('Making API call');
             const result = await client.image({
                 model: TogetherImageModel.Stable_Diffusion_XL_1_0,
@@ -33,6 +32,11 @@ export const RewardStoreHome = () => {
             const newResponses = result.output.choices.map(choice => choice.imageBase64);
             setApiResponses(newResponses);
             setLoading(false);
+
+            // Upload each image as soon as it's generated
+            newResponses.forEach(response => {
+                uploadImageToStorage(response);
+            });
         } catch (error) {
             console.error(error);
             setLoading(false);
@@ -63,6 +67,8 @@ export const RewardStoreHome = () => {
             
             if (response.data === "Saved successfully") {
                 const imageURL = `${baseDir}/${id}.jpeg`; // Adjust the URL structure according to your API
+                const db = getFirestore();
+                await addDoc(collection(db, "prenft-images"), { imageUrl: imageURL });
                 return imageURL;
             } else {
                 console.log(response.data);
@@ -118,7 +124,7 @@ export const RewardStoreHome = () => {
                                                 styles.imageContainer,
                                                 selectedImage === response && styles.selectedImageContainer
                                             ]}
-                                            onPress={() => addToProfileWallet(response)}
+                                            onPress={() => setSelectedImage(response)}
                                         >
                                             {selectedImage === response && (
                                                 <View style={styles.checkIcon}>
@@ -131,8 +137,8 @@ export const RewardStoreHome = () => {
                                 </View>
                             </ScrollView>
                             {selectedImage && (
-                                <TouchableOpacity style={styles.button} onPress={handleNext}>
-                                    <Text style={styles.text}>Next</Text>
+                                <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+                                    <Text style={styles.nextButtonText}>Next</Text>
                                 </TouchableOpacity>
                             )}
                         </>
@@ -198,6 +204,24 @@ const styles = StyleSheet.create({
         alignItems: "center",
         zIndex: 1,
     },
+    nextButton: {
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        backgroundColor: "#ff4757", // A red color for the logout button
+        borderRadius: 20, // Rounded corners for the button
+        borderWidth: 1,
+        borderColor: "#ff6b81", // Slightly lighter red for the border
+        elevation: 2, // Adds a slight shadow for Android
+        shadowColor: "#000", // Shadow for iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+      },
+      nextButtonText: {
+        color: "#fff", // White text color
+        fontSize: 16,
+        fontWeight: "bold",
+      },
 });
 
 export default RewardStoreHome;
