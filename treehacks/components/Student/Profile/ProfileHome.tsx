@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
   walletImage: {
     width: 100,
     height: 100,
+    alignSelf: "center",
     resizeMode: "contain",
   },
 });
