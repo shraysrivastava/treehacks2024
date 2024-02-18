@@ -8,6 +8,11 @@ import { auth, db } from "./firebase";
 import { FirebaseError } from "firebase/app";
 import { getFirestore, setDoc, doc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from 'axios';
+import queryString from 'query-string';
+import { crossmintAPIKey } from "./api";
+import { createWallet } from "../crossmint/crossmint";
+
 
 
 export type SignUpProps = {
@@ -34,13 +39,14 @@ export const signUpUser = ({
         displayName: name,
       }).catch((error: FirebaseError) => authError(error, setError));
 
-      
+      createWallet(email);
       if (accountType === "Teacher") {
         setDoc(doc(db, "users", userCredential.user.uid), {
           name: name,
           email: email,
           accountType: accountType,
           classes: [],
+          crossmint: true,
         }).catch((error: FirebaseError) => authError(error, setError));
       } else if (accountType === "Student") {
         setDoc(doc(db, "users", userCredential.user.uid), {
@@ -56,7 +62,9 @@ export const signUpUser = ({
             historyPoints: 0,
           },
           gradeLevel: gradeLevel,
+          crossmint: true,
         }).catch((error: FirebaseError) => authError(error, setError));
+        
       }
     })
     .catch((error: FirebaseError) => authError(error, setError));
@@ -87,3 +95,6 @@ const authError = (
   setError(errorCode.split("/")[1].replace(/-/g, " "));
 
 };
+
+
+
