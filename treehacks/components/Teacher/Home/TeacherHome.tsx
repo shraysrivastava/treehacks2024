@@ -1,5 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  RefreshControl,
+  TouchableOpacity,
+  SafeAreaView,
+} from "react-native";
 import { getFirestore, doc, updateDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../../firebase/firebase";
 import { CreateClass } from "./CreateClass";
@@ -8,10 +16,13 @@ import { TeacherData } from "../../../constants/types";
 import { useNavigation } from "@react-navigation/native";
 import { Colors } from "../../../constants/Colors";
 import CustomToast, { ToastProps } from "../../../constants/Toast";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export const TeacherHome: React.FC = () => {
   const navigation = useNavigation();
-  const [teacherData, setTeacherData] = useState<TeacherData | undefined>(undefined);
+  const [teacherData, setTeacherData] = useState<TeacherData | undefined>(
+    undefined
+  );
   const [createClassPopup, setCreateClassPopup] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [toast, setToast] = useState<ToastProps>({ message: "", color: "" });
@@ -38,13 +49,13 @@ export const TeacherHome: React.FC = () => {
     fetchTeacherData().then(() => setRefreshing(false));
   }, [fetchTeacherData]);
 
-  const updateClass = async (className: string) => { 
+  const updateClass = async (className: string) => {
     const user = auth.currentUser;
     if (!user) {
       setToast({ message: "No user logged in", color: "red" });
       return;
     }
-  
+
     const userDocRef = doc(db, "users", user.uid);
     try {
       const docSnap = await getDoc(userDocRef);
@@ -52,7 +63,7 @@ export const TeacherHome: React.FC = () => {
         setToast({ message: "Document does not exist", color: "red" });
         return;
       }
-  
+
       const userData = docSnap.data();
       const updatedClasses = { ...userData.classes, [className]: [] };
       await updateDoc(userDocRef, { classes: updatedClasses });
@@ -66,7 +77,7 @@ export const TeacherHome: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scrollViewContent}
         refreshControl={
@@ -75,51 +86,59 @@ export const TeacherHome: React.FC = () => {
             onRefresh={onRefresh}
             colors={[Colors.primary]}
             tintColor={Colors.primary}
-            progressBackgroundColor={Colors.background}  
+            progressBackgroundColor={Colors.background}
           />
         }
       >
-        {teacherData && teacherData.classes && Object.keys(teacherData.classes).length > 0 ? (
+        {teacherData &&
+        teacherData.classes &&
+        Object.keys(teacherData.classes).length > 0 ? (
           <ShowClasses teacherData={teacherData} navigation={navigation} />
         ) : (
           <Text style={styles.noClassesText}>
             You don't have any classes yet. Would you like to create one?
-          </Text> 
+          </Text>
         )}
       </ScrollView>
-      <TouchableOpacity style={styles.button} onPress={() => setCreateClassPopup(true)}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => setCreateClassPopup(true)}
+      >
+        <MaterialIcons name="add" size={24} color="#fff" />
         <Text style={styles.buttonText}>Create Class</Text>
       </TouchableOpacity>
-       <CreateClass isVisible={createClassPopup} onCancel={() => setCreateClassPopup(false)} onConfirm={updateClass} />
-      <CustomToast message={toast.message} color={toast.color}/>
-    </SafeAreaView>
+      <CreateClass isVisible={createClassPopup} onCancel={() => setCreateClassPopup(false)} onConfirm={updateClass} />
+      <CustomToast message={toast.message} color={toast.color} />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "lightblue",
+    backgroundColor: Colors.background,
+    padding: 10,
   },
   scrollViewContent: {
-    paddingVertical: 20,
+    flexGrow: 1, 
+    justifyContent: "center",
+    padding: 15,
   },
   noClassesText: {
     color: Colors.textPrimary,
-    textAlign: 'center',
+    textAlign: "center",
     padding: 20,
     fontSize: 18,
+    fontWeight: "500", 
   },
   button: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.accent1, 
     paddingVertical: 12,
-    paddingHorizontal: 25,
+    paddingHorizontal: 20,
     borderRadius: 25,
-    alignSelf: 'center',
-    marginVertical: 10,
-    width: '90%', // Ensure the button stretches to fit the container width
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -130,10 +149,10 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   buttonText: {
-    color: "#fff",
-    fontSize: 16,
+    color: Colors.textSecondary,
+    fontSize: 18,
     fontWeight: "bold",
-    textAlign: "center",
+    marginLeft: 10,
   },
 });
 

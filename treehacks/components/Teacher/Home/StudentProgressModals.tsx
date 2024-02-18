@@ -8,7 +8,21 @@ import { StudentData } from "../../../constants/types";
 interface StudentProgressProps {
     student: StudentData;
     studentKey: string;  
-  } 
+} 
+interface Subjects {
+    mathPoints: string;
+    sciencePoints: string;
+    englishPoints: string;
+    historyPoints: string;
+    [key: string]: string;
+}
+
+const convertSubject: Subjects = {
+  "mathPoints": "Math",
+  "sciencePoints": "Science",
+  "englishPoints": "English",
+  "historyPoints": "History",
+}
   
 export const StudentProgress: React.FC<StudentProgressProps> = ({ student, studentKey }) => {
     return (
@@ -17,7 +31,7 @@ export const StudentProgress: React.FC<StudentProgressProps> = ({ student, stude
         {Object.entries(student.subjectPoints).map(([subject, points], index) => (
           // subject for multiple students will create multiple views with same keys
           <View key={subject + student.email + index.toString()} style={styles.subjectProgressContainer}>
-            <Text style={styles.subjectName}>{subject}</Text>
+            <Text style={styles.subjectName}>{convertSubject[subject]}</Text>
             <ProgressBar count={points} capacity={10}/> 
           </View>
         ))} 

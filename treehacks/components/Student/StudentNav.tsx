@@ -7,6 +7,7 @@ import React from "react";
 import { StudentHomeStack } from "./Home/StudentHomeStack";
 import { ProfileHomeStack } from "./Profile/ProfileHomeStack";
 import { RewardStoreStack } from "./RewardStore/RewardStoreStack";
+import { LeaderBoard } from "./LeaderBoard";
 
 const Tab = createBottomTabNavigator();
 
@@ -56,7 +57,17 @@ export const StudentNav = () => {
                     <MaterialIcons name="savings" color={color} size={size} />
               ),
             })}
-          />
+          />        
+          <Tab.Screen
+            name="Leaderboard"
+            component={LeaderBoard}
+            options={() => ({
+                tabBarIcon: ({ color, size }) => (
+                    <MaterialIcons name="savings" color={color} size={size} />
+              ),
+            })}
+          />   
+          
          
 
         </Tab.Navigator>

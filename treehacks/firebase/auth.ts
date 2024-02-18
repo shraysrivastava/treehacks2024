@@ -13,8 +13,6 @@ import queryString from 'query-string';
 import { crossmintAPIKey } from "./api";
 import { createWallet } from "../crossmint/crossmint";
 
-
-
 export type SignUpProps = {
   name: string;
   email: string;
