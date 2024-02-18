@@ -6,6 +6,7 @@ import { Colors } from "../../../constants/Colors";
 import { Mathematics } from "./Subjects/Mathematics";
 import { Science } from "./Subjects/Science";
 import { History } from "./Subjects/History";
+import {Course}  from "./Subjects/Course";
 
 const Stack = createStackNavigator();
 
@@ -19,14 +20,15 @@ export const StudentHomeStack = () => {
         headerShown: true,
         headerTintColor: "#fff",
         headerBackTitleVisible: false,
-        headerStyle: { backgroundColor: Colors.primary,  },
-        headerTitleStyle: { fontWeight: "bold", color: Colors.background}
+        headerStyle: { backgroundColor: Colors.primary },
+        headerTitleStyle: { fontWeight: "bold", color: Colors.background },
       }}
     >
       <Stack.Screen name="Dashboard" component={StudentHome} />
       <Stack.Screen name="Mathematics" component={Mathematics} />
       <Stack.Screen name="Science" component={Science} />
       <Stack.Screen name="History" component={History} />
+      <Stack.Screen name="Course" component={Course} />
     </Stack.Navigator>
   );
 };

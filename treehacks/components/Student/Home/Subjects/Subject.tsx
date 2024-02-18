@@ -8,6 +8,22 @@ export type SubjectProps = {
   subjectColor: string;
   navigation?: any;
   icon: any;
+  coursePath?: string
+};
+
+const navigateTo: any = (subName: string, navigation: any, coursePath?: string) => {
+  if (
+    subName != "Mathematics" &&
+    subName != "Science" &&
+    subName != "History"
+  ) {
+    subName = "Course";
+    navigation.navigate(subName, { coursePath });
+  } else {
+    navigation.navigate(subName)
+  }
+
+  
 };
 
 const Subject = ({
@@ -15,12 +31,13 @@ const Subject = ({
   gradeLevel,
   subjectColor,
   navigation,
-  icon
+  icon,
+  coursePath
 }: SubjectProps) => {
   return (
     <TouchableOpacity
       style={[styles.container, { backgroundColor: subjectColor }]}
-      onPress={() => navigation.navigate(subjectName)}
+      onPress={() => navigateTo(subjectName, navigation, coursePath)}
     >
       <View style={styles.iconContainer}>
         <MaterialIcons name={icon} size={40} color="white" />
@@ -36,8 +53,8 @@ const Subject = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    width: '95%',
-    alignSelf: 'center',
+    width: "95%",
+    alignSelf: "center",
     height: 120,
     borderRadius: 20,
     justifyContent: "flex-start",

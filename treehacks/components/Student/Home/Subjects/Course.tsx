@@ -20,15 +20,20 @@ import {
 import { auth } from "../../../../firebase/firebase";
 import { Colors } from "../../../../constants/Colors";
 import CustomToast, { ToastProps } from "../../../../constants/Toast";
+import { RouteProp } from "@react-navigation/native";
 const { width } = Dimensions.get("window");
 
-export const History = () => {
+interface ShowStudentsProps {
+  route: RouteProp<{ params: { coursePath: string } }, "params">;
+}
+
+export const Course: React.FC<ShowStudentsProps> = ({ route }) => {
+  const { coursePath } = route.params;
+  console.log(coursePath);
   const [questionData, setQuestionData] = useState<DocumentData>();
   const [studentData, setStudentData] = useState<DocumentData>();
   const [pointsUpdated, setPointsUpdated] = useState(false);
   const [toast, setToast] = useState<ToastProps>({ message: "", color: "" });
-  const [showFeedback, setShowFeedback] = useState(false); // State for showing/hiding feedback
-  const [hint, setHint] = useState<string | null>(null); // State to store the hint
   const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -47,15 +52,9 @@ export const History = () => {
         }
       }
     };
-
+    fetchRandomQuestion(coursePath);
     fetchStudentData();
   }, [pointsUpdated]);
-
-  useEffect(() => {
-    if (studentData) {
-      fetchRandomQuestion();
-    }
-  }, [studentData]);
 
   useEffect(() => {
     if (toast.message !== "") {
@@ -71,69 +70,39 @@ export const History = () => {
     };
   }, [toast.message]);
 
-  useEffect(() => {
-    // Fetch hint when showFeedback is true
-    if (showFeedback) {
-      getHint().then((hint) => {
-        setHint(hint);
-      });
-    }
-  }, [showFeedback]);
-
-  const url: string = 'https://api.together.xyz/v1/chat/completions';
-  const apiKey: string = '77712fb6e31d5284a3c4015b53a49f6c4a9d093e29232cef4ff609c5c935a7d6';
-  const getHint = async () => {
-    const headers: HeadersInit = new Headers({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    });
-
-    const data: { model: string, max_tokens: number, messages: { role: string, content: string }[] } = {
-      model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
-      max_tokens: 1024,
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an AI assistant'
-        },
-        {
-          role: 'user',
-          content: `Give a hint for this question ${questionData?.question} as if you are talking to a student of ${studentData?.gradeLevel} grade level.`
-        }
-      ]
-    };
-
-    const options = {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(data)
-    };
+  const fetchRandomQuestion = async (courseId: string) => {
+    const db = getFirestore();
+    const courseRef = doc(db, "courses", courseId);
 
     try {
-      const response = await fetch(url, options);
-      const result = await response.json();
-      return result.choices[0].message.content;
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
+      const courseSnap = await getDoc(courseRef);
 
-  const fetchRandomQuestion = async () => {
-    setShowFeedback(false); // Reset showFeedback state when fetching a new question
-    const db = getFirestore();
-    const collectionRef = collection(
-      db,
-      `grade-${studentData?.gradeLevel}History`
-    );
-    const querySnapshot = await getDocs(collectionRef);
-    const questions: DocumentData[] = [];
-    querySnapshot.forEach((doc) => {
-      questions.push({ id: doc.id, ...doc.data() });
-    });
-  
-    const randomIndex = Math.floor(Math.random() * questions.length);
-    const randomQuestion = questions[randomIndex];
-    setQuestionData(randomQuestion);
+      if (!courseSnap.exists()) {
+        console.log("Course document not found");
+        return;
+      }
+
+      const questionsRef = collection(
+        db,
+        "courses",
+        courseId,
+        "courseData",
+        "questions",
+        "0"
+      );
+      const querySnapshot = await getDocs(questionsRef);
+
+      const questions = querySnapshot.docs.map((doc) => doc.data());
+
+      
+
+      const randomIndex = Math.floor(Math.random() * questions.length);
+      const randomQuestion = questions[randomIndex];
+
+      setQuestionData(randomQuestion);
+    } catch (error) {
+      console.error("Error fetching random question:", error);
+    }
   };
 
   const shuffleArray = (array: string[]) => {
@@ -146,27 +115,18 @@ export const History = () => {
 
   const handleAnswerSelect = async (selectedAnswer: string) => {
     if (selectedAnswer === questionData?.answer) {
-      setToast({ message: "Correct!", color: Colors.toastSuccess})
+      setToast({ message: "Correct!", color: Colors.toastSuccess });
       const newPoints = studentData?.points + 1;
-      const newHistoryPoints = studentData?.subjectPoints.historyPoints + 1;
-      updatePoints(newPoints, newHistoryPoints);
+      const newSciencePoints = studentData?.subjectPoints.sciencePoints + 1;
+      updatePoints(newPoints, newSciencePoints);
     } else {
       setToast({ message: "Try Again.", color: Colors.toastError });
-      setShowFeedback(true); // Show feedback if the answer is wrong
-      // Fetch hint if needed
-      if (!hint) {
-        try {
-          const hintFromAPI = await getHint();
-          setHint(hintFromAPI);
-        } catch (error) {
-          console.error('Error fetching hint:', error);
-        }
-      }
+
       return; // Skip fetching the next question
     }
-  
+
     // Proceed to fetch the next question only if the answer is correct
-    fetchRandomQuestion();
+    fetchRandomQuestion(coursePath);
   };
 
   const updatePoints = async (newPoints: number, newHistoryPoints: number) => {
@@ -194,7 +154,12 @@ export const History = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: Colors.background }]}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: Colors.background },
+      ]}
+    >
       {questionData && (
         <View style={styles.questionContainer}>
           <Text style={[styles.questionText, { color: Colors.secondary }]}>
@@ -214,17 +179,9 @@ export const History = () => {
               <Text style={styles.buttonText}>{answer}</Text>
             </TouchableOpacity>
           ))}
-          {showFeedback && (
-            <View style={styles.feedbackContainer}>
-              <Text style={styles.feedbackText}>Oops! That's not correct!</Text>
-              <Text style={styles.AItext}>
-                Here's an AI hint: {hint}
-              </Text>
-            </View>
-          )}
         </View>
       )}
-      <CustomToast message={toast.message} color={toast.color}/>
+      <CustomToast message={toast.message} color={toast.color} />
     </ScrollView>
   );
 };
@@ -279,5 +236,5 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 5,
-  }
+  },
 });
