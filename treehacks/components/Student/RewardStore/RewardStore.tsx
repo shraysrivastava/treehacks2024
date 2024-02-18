@@ -7,7 +7,6 @@ import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage"
 import axios from 'axios';
 import { baseDir, togetherAPIKey, uploaderEndpoint, uploaderKey } from "./api";
 import queryString from 'query-string';
-import { createNFT } from "../../../crossmint/crossmint";
 
 export const RewardStoreHome = () => {
     const [apiResponses, setApiResponses] = useState<string[]>([]);
@@ -97,8 +96,6 @@ export const RewardStoreHome = () => {
                 });
                 setSelectedImage(downloadURL);
                 await addDoc(collection(db, "prenft-images"), { imageUrl: downloadURL });
-
-                createNFT(user.email!, downloadURL);
             }
         } catch (error) {
             console.error("Error adding image to wallet:", error);
@@ -108,9 +105,6 @@ export const RewardStoreHome = () => {
     const handleNext = () => {
         // Handle the next action
         console.log("Next button clicked");
-        // Pass the ur
-        addToProfileWallet(selectedImage!);
-        
     };
 
     return (
