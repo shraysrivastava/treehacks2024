@@ -9,6 +9,9 @@ import { Auth } from './components/Auth/Auth';
 import { fetchUserData } from './firebase/firestore';
 import { TeacherNav } from './components/Teacher/TeacherNav';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LogBox } from "react-native"
+
+LogBox.ignoreAllLogs(true)
 // import { encode, decode } from 'js-base64';
 
 /* if(typeof atob === 'undefined') {
