@@ -108,9 +108,8 @@ export const RewardStoreHome = () => {
     const handleNext = () => {
         // Handle the next action
         console.log("Next button clicked");
-        // Pass the ur
+        // Pass the url
         addToProfileWallet(selectedImage!);
-        
     };
 
     return (

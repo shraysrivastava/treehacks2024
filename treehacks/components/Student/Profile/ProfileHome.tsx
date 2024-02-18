@@ -65,10 +65,17 @@ export const ProfileHome = () => {
             </Text>
           </View>
           {studentData.wallet && (
-            <Image
-              source={{ uri: studentData.wallet[0].imageUrl}}
-              style={styles.walletImage}
-            />
+            <View>
+              <Text style={styles.label}>My Collection:</Text>
+            <View style={styles.imagesContainer}> 
+            <TouchableOpacity>
+              <Image
+                source={{ uri: studentData.wallet[0].imageUrl}}
+                style={styles.walletImage}
+              />
+            </TouchableOpacity>
+            </View>
+            </View>
           )}
         </View>
       )}
@@ -88,6 +95,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#f5f5f5", // Light grey background
+  },
+  imagesContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
   },
   text: {
     fontSize: 24,
@@ -142,8 +155,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   walletImage: {
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 200,
+    alignSelf: "center",
     resizeMode: "contain",
   },
 });
