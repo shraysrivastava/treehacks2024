@@ -40,15 +40,7 @@ export const StudentNav = () => {
               ),
             })}
           />
-          <Tab.Screen
-            name="Profile"
-            component={ProfileHomeStack}
-            options={() => ({
-                tabBarIcon: ({ color, size }) => (
-                    <MaterialIcons name="account-circle" color={color} size={size} />
-              ),
-            })}
-          />
+          
           <Tab.Screen
             name="Wallet"
             component={RewardStoreStack}
@@ -67,7 +59,16 @@ export const StudentNav = () => {
                     <MaterialIcons name="leaderboard" color={color} size={size} />
               ),
             })}
-          />   
+          />  
+          <Tab.Screen
+            name="Profile"
+            component={ProfileHomeStack}
+            options={() => ({
+                tabBarIcon: ({ color, size }) => (
+                    <MaterialIcons name="account-circle" color={color} size={size} />
+              ),
+            })}
+          /> 
           
          
 

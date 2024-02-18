@@ -53,7 +53,6 @@ export const StudentHome: React.FC = () => {
   };
   const fetchCourses = async (classes: string[]) => {
   
-    // Ensure there are classes to process
     if (!classes || classes.length === 0) {
       console.log("No classes found for the student.");
       return;
@@ -61,16 +60,15 @@ export const StudentHome: React.FC = () => {
   
     const coursesRef = collection(db, "courses");
   
-    // Process each class UID to fetch course details
     for (const classUID of classes) {
       try {
-        const docRef = doc(coursesRef, classUID); // Direct reference to the course document by UID
+        const docRef = doc(coursesRef, classUID); 
         const docSnap = await getDoc(docRef);
   
         if (docSnap.exists()) {
           setCourses([{
             subjectName: docSnap.data().courseData.courseName,
-            gradeLevel: docSnap.data().gradeLevel,
+            gradeLevel: "Teacher Assigned Work",
             subjectColor: determineSubjectColor(docSnap.data().courseData.courseName),
             icon: "book",
           }]);
@@ -87,7 +85,6 @@ export const StudentHome: React.FC = () => {
     
   };
   
-  // Example function to determine subject color dynamically
   const determineSubjectColor = (subjectName: string) => {
     switch (subjectName?.toLowerCase()) {
       case "mathematics":
@@ -98,6 +95,19 @@ export const StudentHome: React.FC = () => {
         return Colors.primary;
       default:
         return Colors.secondary; // Default color
+    }
+  };
+
+  const determineDisplayName = (grade: string) => {
+    switch (grade) {
+      case "1":
+        return "1st Grade";
+      case "2":
+        return "2nd Grade";
+      case "3":
+        return "3rd Grade";
+      default:
+        return `${grade}th Grade`;
     }
   };
 
@@ -135,7 +145,7 @@ export const StudentHome: React.FC = () => {
           <Subject
             key={index}
             subjectName={subject.subjectName}
-            gradeLevel={subject.gradeLevel}
+            gradeLevel={determineDisplayName(subject.gradeLevel)}
             subjectColor={subject.subjectColor}
             navigation={navigation}
             icon={subject.icon}
@@ -144,7 +154,7 @@ export const StudentHome: React.FC = () => {
           {courses.map((subject: DocumentData, index: number) => (
             <Subject
               key={index}
-              subjectName={subject.courseName}
+              subjectName={subject.subjectName}
               gradeLevel={subject.gradeLevel}
               subjectColor={subject.subjectColor}
               navigation={navigation}

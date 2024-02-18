@@ -10,7 +10,7 @@ import { getFirestore, setDoc, doc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
 import queryString from 'query-string';
-import { crossmintAPIKey } from "./api";
+// import { crossmintAPIKey } from "./api";
 import { createWallet } from "../crossmint/crossmint";
 
 export type SignUpProps = {
