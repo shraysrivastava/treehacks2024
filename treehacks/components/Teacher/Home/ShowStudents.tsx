@@ -86,8 +86,8 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
 
   useEffect(() => {
     fetchStudentData();
-    fetchTeacherData();
-  }, [fetchStudentData, fetchTeacherData]);
+  //  / fetchTeacherData();
+  }, [fetchStudentData,]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -170,7 +170,7 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
 
       if (!querySnapshot.empty) {
         const studentDocRef = querySnapshot.docs[0].ref; // Assuming email is unique, there should only be one document
-        const courseName = `${userData.name}-${className}`; // Format: teacherName-courseName
+        const courseName = `${userData.name}=${className}`; // Format: teacherName=courseName
 
         await updateDoc(studentDocRef, {
           classes: arrayUnion(courseName),
@@ -198,7 +198,7 @@ export const ShowStudents: React.FC<ShowStudentsProps> = ({ route }) => {
 
   const navigation = useNavigation<TeacherHomeNavigationProps>();
   
-  const coursePath = teacherData?.name + "-" + className;
+  const coursePath = teacherData?.name + "=" + className;
   return (
     <View style={styles.container}>
       <ScrollView

@@ -10,7 +10,7 @@ interface ProgressBarProps {
 export const ProgressBar: React.FC<ProgressBarProps> = ({ count, capacity }) => {
   const clampedProgress = Math.max(0, Math.min(count / capacity, 1));
   const percentage = Math.round(clampedProgress * 100);
-  let progressBarColor = Colors.primary;
+  let progressBarColor = Colors.accent1;
 
   return (
     <View style={styles.container}>
@@ -55,14 +55,14 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontWeight: 'bold',
-    color: 'white', // Ensuring text is visible on colored background
+    color: 'black', // Ensuring text is visible on colored background
   },
   unfilledProgressText: {
     position: 'absolute',
     left: 0,
     right: 0,
     textAlign: 'center', // Center text horizontally
-    color: 'white', // Text color for unfilled section
+    color: 'black', // Text color for unfilled section
   },
   countCapacityText: {
     marginLeft: 5,

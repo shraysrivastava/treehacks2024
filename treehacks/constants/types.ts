@@ -1,6 +1,6 @@
 export interface StudentData {
     accountType: string;
-    class: string;
+    classes: Array<string>;
     email: string;
     gradeLevel: string;
     name: string;

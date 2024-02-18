@@ -1,39 +1,23 @@
 // StudentHome.js
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, SafeAreaView, ScrollView } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, RefreshControl } from "react-native";
 import Subject from "./Subjects/Subject";
 import { SubjectProps } from "./Subjects/Subject";
 import { Colors } from "../../../constants/Colors";
 import { useNavigation } from "@react-navigation/native";
 import { auth, db } from "../../../firebase/firebase";
-import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { DocumentData, collection, doc, getDoc, getFirestore } from "firebase/firestore";
 import { StudentData } from "../../../constants/types";
+
 
 export const StudentHome: React.FC = () => {
   const [studentData, setStudentData] = useState<StudentData>();
-  useEffect(() => {
-    const fetchStudentData = async () => {
-      const db = getFirestore();
-      const user = auth.currentUser;
-
-      if (user) {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          setStudentData(docSnap.data() as StudentData);
-        } else {
-          console.log("No such document!");
-        }
-      }
-    };
-
-    fetchStudentData();
-  }, []);
-
+  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
-  const subjects: SubjectProps[] = [
-    {
+  
+  const [courses, setCourses] = useState<DocumentData>([]);
+  const [subjects, setSubjects] = useState<SubjectProps[]>(
+    [{
       subjectName: "Mathematics",
       gradeLevel: studentData?.gradeLevel || "1",
       subjectColor: Colors.accent1,
@@ -51,11 +35,101 @@ export const StudentHome: React.FC = () => {
       subjectColor: Colors.primary,
       icon: "history",
     },
-  ];
+  ]);
+  const fetchStudentData = async () => {
+    const db = getFirestore();
+    const user = auth.currentUser;
+
+    if (user) {
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setStudentData(docSnap.data() as StudentData);
+      } else {
+        console.log("No such document!");
+      }
+    }
+  };
+  const fetchCourses = async (classes: string[]) => {
+  
+    // Ensure there are classes to process
+    if (!classes || classes.length === 0) {
+      console.log("No classes found for the student.");
+      return;
+    }
+  
+    const coursesRef = collection(db, "courses");
+  
+    // Process each class UID to fetch course details
+    for (const classUID of classes) {
+      try {
+        const docRef = doc(coursesRef, classUID); // Direct reference to the course document by UID
+        const docSnap = await getDoc(docRef);
+  
+        if (docSnap.exists()) {
+          setCourses([{
+            subjectName: docSnap.data().courseData.courseName,
+            gradeLevel: docSnap.data().gradeLevel,
+            subjectColor: determineSubjectColor(docSnap.data().courseData.courseName),
+            icon: "book",
+          }]);
+          
+          
+        } else {
+          console.log(`No course found for UID: ${classUID}`);
+        }
+      } catch (error) {
+        console.error(`Error fetching course for UID: ${classUID}`, error);
+      }
+    }
+    console.log("Fetched courses:", courses);
+    
+  };
+  
+  // Example function to determine subject color dynamically
+  const determineSubjectColor = (subjectName: string) => {
+    switch (subjectName?.toLowerCase()) {
+      case "mathematics":
+        return Colors.accent1;
+      case "science":
+        return Colors.accent2;
+      case "history":
+        return Colors.primary;
+      default:
+        return Colors.secondary; // Default color
+    }
+  };
+
+  useEffect(() => {
+    fetchStudentData();
+    fetchCourses(studentData?.classes || []);
+  }, []);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchCourses(studentData?.classes || [])
+      .then(fetchStudentData)
+      .finally(() => setRefreshing(false));
+  }, [fetchStudentData]);
+
+
+
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollView}>
+      <ScrollView contentContainerStyle={styles.scrollView}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[Colors.secondary]}
+            tintColor={Colors.secondary}
+            progressBackgroundColor="#ffffff"
+          />
+        }
+      >
+        <>
         <Text style={styles.headerText}>Welcome, {studentData?.name}!</Text>
         {subjects.map((subject, index) => (
           <Subject
@@ -67,6 +141,17 @@ export const StudentHome: React.FC = () => {
             icon={subject.icon}
           />
         ))}
+          {courses.map((subject: DocumentData, index: number) => (
+            <Subject
+              key={index}
+              subjectName={subject.courseName}
+              gradeLevel={subject.gradeLevel}
+              subjectColor={subject.subjectColor}
+              navigation={navigation}
+              icon={subject.icon}
+            />
+        ))}
+        </>
       </ScrollView>
     </SafeAreaView>
   );

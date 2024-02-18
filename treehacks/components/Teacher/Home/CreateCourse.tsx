@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,9 @@ import {
   Button,
   StyleSheet,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  ScrollView,
+  RefreshControl,
 } from "react-native";
 import { db } from "../../../firebase/firebase";
 import {
@@ -20,6 +23,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { RouteProp } from "@react-navigation/native";
+import CustomToast, { ToastProps } from "../../../constants/Toast";
 
 interface Question {
   question: string;
@@ -41,6 +45,8 @@ export const CreateCourse: React.FC<CreateClassProps> = ({ route }) => {
   const [wrongAnswer2, setWrongAnswer2] = useState<string>("");
   const [wrongAnswer3, setWrongAnswer3] = useState<string>("");
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [toast, setToast] = useState<ToastProps>({ message: "", color: "" });
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleAddQuestion = () => {
     const newQuestion: Question = {
@@ -63,9 +69,10 @@ export const CreateCourse: React.FC<CreateClassProps> = ({ route }) => {
     try {
       const courseData = {
         courseName,
+        coursePath,
         questions,
       };
-      const docRef = doc(db, "courses", coursePath + "-" + courseName);
+      const docRef = doc(db, "courses", coursePath);
       console.log("Document written with ID: ", docRef.id);
       await setDoc(docRef, { courseData });
       // Clear fields after creating course
@@ -76,8 +83,34 @@ export const CreateCourse: React.FC<CreateClassProps> = ({ route }) => {
     }
   };
 
+  useEffect(() => {
+    if (toast.message !== "") {
+      toastTimeoutRef.current = setTimeout(() => {
+        setToast({ message: "", color: "" });
+      }, 2000);
+    }
+
+    return () => {
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
+    };
+  }, [toast.message]);
+
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView style={styles.container}>
+      <ScrollView
+        // refreshControl={
+        //   <RefreshControl
+        //     refreshing={refreshing}
+        //     onRefresh={onRefresh}
+        //     colors={[Colors.secondary]}
+        //     tintColor={Colors.secondary}
+        //     progressBackgroundColor="#ffffff"
+        //   />
+        // }
+      >
+        
       <View style={styles.questionContainer}>
         <Text style={styles.label}>Course Name:</Text>
         <TextInput
@@ -132,7 +165,10 @@ export const CreateCourse: React.FC<CreateClassProps> = ({ route }) => {
       <TouchableOpacity style={styles.button} onPress={handleCreateCourse}>
         <Text style={styles.buttonText}>Create Course</Text>
       </TouchableOpacity>
-    </View>
+      <CustomToast message={toast.message} color={toast.message} />
+      </ScrollView>
+      </KeyboardAvoidingView>
+    
   );
 };
 
