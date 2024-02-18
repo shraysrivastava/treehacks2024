@@ -57,15 +57,7 @@ export const StudentNav = () => {
               ),
             })}
           />
-          <Tab.Screen
-            name="MyPrize"
-            component={RewardStoreStack}
-            options={() => ({
-                tabBarIcon: ({ color, size }) => (
-                    <MaterialIcons name="face" color={color} size={size} />
-              ),
-            })}
-          />
+         
 
         </Tab.Navigator>
       </NavigationContainer>
