@@ -48,7 +48,7 @@ export const StudentHome: React.FC = () => {
       subjectName: "History",
       gradeLevel: studentData?.gradeLevel || "1",
       subjectColor: Colors.primary,
-      icon: "history",
+      icon: "public",
     },
     {
       subjectName: "Physics",
@@ -177,7 +177,7 @@ export const StudentHome: React.FC = () => {
         }
       >
         <>
-        <Text style={styles.headerText}>Welcome, {studentData?.name}!</Text>
+        <Text style={styles.headerText}>Welcome{studentData && (", "+ studentData?.name)}!</Text>
         {/* <Button title="Sign Out" onPress={() => signOutUser(setError)} /> */}
         {subjects.map((subject, index) => (
           <Subject
