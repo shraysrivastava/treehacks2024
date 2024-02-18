@@ -20,6 +20,7 @@ import {
 } from "firebase/firestore";
 import { Colors } from "../../../../constants/Colors";
 import CustomToast, { ToastProps } from "../../../../constants/Toast";
+import Skip from "../../../Skip";
 const { width } = Dimensions.get("window");
 
 export const Mathematics = () => {
@@ -168,6 +169,7 @@ export const Mathematics = () => {
           <Text style={styles.buttonText}>Check Answer</Text>
         </TouchableOpacity>
         <Text style={styles.result}>{correctAnswer}</Text>
+        <Skip onPress={generateQuestion}></Skip>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -178,66 +180,50 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.lightBlue, // Updated background color
+    paddingHorizontal: 20, // Added horizontal padding
   },
   header: {
-    fontSize: 50, // Increased font size
-    marginBottom: 20, // Increased margin for better spacing
-    color: Colors.secondary,
-  },
-  gradeLevel: {
-    fontSize: 35, // Increased font size
-    marginBottom: 20, // Increased margin for better spacing
-    color: Colors.secondary,
+    fontSize: 36,
+    marginBottom: 20,
+    color: Colors.darkBlue, // Updated text color
+    fontWeight: "bold", // Added font weight
   },
   question: {
-    fontSize: 50, // Increased font size
-    marginBottom: 20, // Increased margin for better spacing
-    color: Colors.secondary,
+    fontSize: 48,
+    marginBottom: 20,
+    color: Colors.darkBlue, // Updated text color
+    fontWeight: "bold", // Added font weight
   },
   input: {
-    borderWidth: 1,
-    borderColor: Colors.secondary,
-    width: width * 0.8, // Adjusted width to take up most of the screen
-    height: 60, // Increased height for better visibility
+    borderWidth: 2,
+    borderColor: Colors.darkBlue, // Updated border color
+    width: width * 0.8,
+    height: 60,
     marginBottom: 20,
-    paddingHorizontal: 20, // Increased padding for better input experience
-    backgroundColor: Colors.secondary,
-    color: Colors.primary,
-    fontSize: 24, // Increased font size
-    borderRadius: 20, // Rounded corners
-  },
-  buttonContainer: {
-    marginBottom: 20, // Increased margin for better spacing
+    paddingHorizontal: 20,
+    backgroundColor: Colors.white, // Updated background color
+    color: Colors.darkBlue, // Updated text color
+    fontSize: 24,
+    borderRadius: 15, // Updated border radius
   },
   button: {
-    marginBottom: 200,
     paddingVertical: 15,
     paddingHorizontal: 20,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.orange, // Updated button color
     borderRadius: 15,
     width: width * 0.8,
     justifyContent: "center",
     alignItems: "center",
   },
   buttonText: {
-    color: Colors.secondary,
-    fontSize: 35, // Increased font size
+    color: Colors.white, // Updated text color
+    fontSize: 24,
     fontWeight: "bold",
   },
   result: {
-    fontSize: 24, // Increased font size
-    fontWeight: "bold",
-    color: Colors.primary,
+    fontSize: 24,
+    color: Colors.darkBlue, // Updated text color
+    fontStyle: "italic", // Added italic style
   },
-  dismissButton: {
-    position: "absolute",
-    top: 20,
-    right: 20,
-    zIndex: 1,
-  },
-  dismissButtonText: {
-    fontSize: 18,
-    color: Colors.secondary
-  }
 });

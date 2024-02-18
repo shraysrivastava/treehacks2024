@@ -19,6 +19,7 @@ import {
 import { auth } from "../../../../firebase/firebase";
 import { Colors } from "../../../../constants/Colors";
 import CustomToast, { ToastProps } from "../../../../constants/Toast";
+import Skip from "../../../Skip";
 
 const { width } = Dimensions.get("window");
 
@@ -194,7 +195,12 @@ export const Science = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: Colors.background }]}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: Colors.background },
+      ]}
+    >
       {questionData && (
         <View style={styles.questionContainer}>
           <Text style={[styles.questionText, { color: Colors.secondary }]}>
@@ -217,14 +223,13 @@ export const Science = () => {
           {showFeedback && (
             <View style={styles.feedbackContainer}>
               <Text style={styles.feedbackText}>Oops! That's not correct!</Text>
-              <Text style={styles.AItext}>
-                Here's an AI hint: {hint}
-              </Text>
+              <Text style={styles.AItext}>Here's an AI hint: {hint}</Text>
             </View>
           )}
+          <Skip onPress={fetchRandomQuestion}></Skip>
         </View>
       )}
-      <CustomToast message={toast.message} color={toast.color}/>
+      <CustomToast message={toast.message} color={toast.color} />
     </ScrollView>
   );
 };
@@ -242,7 +247,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   questionText: {
-    fontSize: 50,
+    fontSize: 28,
     marginBottom: 20,
     color: Colors.secondary,
   },
@@ -257,7 +262,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonText: {
-    fontSize: 35,
+    fontSize: 33,
     color: Colors.secondary,
   },
   feedbackContainer: {
