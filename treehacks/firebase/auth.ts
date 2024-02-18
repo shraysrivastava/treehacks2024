@@ -9,6 +9,7 @@ import { FirebaseError } from "firebase/app";
 import { getFirestore, setDoc, doc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+
 export type SignUpProps = {
   name: string;
   email: string;
@@ -84,4 +85,5 @@ const authError = (
 ) => {
   const errorCode: string = error.code;
   setError(errorCode.split("/")[1].replace(/-/g, " "));
+
 };

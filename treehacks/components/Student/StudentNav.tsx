@@ -3,10 +3,10 @@ import { NavigationContainer } from "@react-navigation/native";
 import { StudentHome } from "./Home/StudentHome";
 import { Colors } from "../../constants/Colors";
 import { MaterialIcons, Entypo } from "@expo/vector-icons";
-
 import React from "react";
 import { StudentHomeStack } from "./Home/StudentHomeStack";
 import { ProfileHomeStack } from "./Profile/ProfileHomeStack";
+import { RewardStoreStack } from "./RewardStore/RewardStoreStack";
 
 const Tab = createBottomTabNavigator();
 
@@ -45,6 +45,24 @@ export const StudentNav = () => {
             options={() => ({
                 tabBarIcon: ({ color, size }) => (
                     <MaterialIcons name="account-circle" color={color} size={size} />
+              ),
+            })}
+          />
+          <Tab.Screen
+            name="Wallet"
+            component={RewardStoreStack}
+            options={() => ({
+                tabBarIcon: ({ color, size }) => (
+                    <MaterialIcons name="savings" color={color} size={size} />
+              ),
+            })}
+          />
+          <Tab.Screen
+            name="MyPrize"
+            component={RewardStoreStack}
+            options={() => ({
+                tabBarIcon: ({ color, size }) => (
+                    <MaterialIcons name="face" color={color} size={size} />
               ),
             })}
           />

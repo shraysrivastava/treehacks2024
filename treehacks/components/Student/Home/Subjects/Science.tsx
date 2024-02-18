@@ -7,7 +7,7 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
-import {
+import { 
   DocumentData,
   collection,
   doc,
