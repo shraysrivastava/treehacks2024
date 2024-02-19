@@ -51,7 +51,7 @@ export const RewardStoreHome = () => {
       const client = togetherClient({ apiKey: togetherAPIKey });
       const result = await client.image({
         model: TogetherImageModel.Stable_Diffusion_XL_1_0,
-        prompt: 'Only one animated cute pokemon-style animal with a natural background',
+        prompt: 'Only one animated funky kong with a banana background',
         width: 512,
         height: 512,
         n: 5,

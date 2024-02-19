@@ -178,7 +178,7 @@ export const StudentHome: React.FC = () => {
           <Text style={styles.headerText}>Welcome {studentData?.name}</Text>
 
           <Text style={styles.headerText}>
-            <Text style={styles.Text}>🌿Freshen</Text> your brain! 🚀
+            <Text style={styles.Text}>🌿Freshen</Text> your mind! 🚀
           </Text>
            <View style={{marginBottom: 10}}/>
             
